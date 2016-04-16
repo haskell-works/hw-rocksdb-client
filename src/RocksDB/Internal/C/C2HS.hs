@@ -107,7 +107,7 @@ withCSPtrCArrayLen :: (Integral c, Storable c)
                    => [String]
                    -> (Int -> Ptr (Ptr b) -> Ptr c -> IO a)
                    -> IO a
-withCSPtrCArrayLen str f = withPtrArrayLen str strToCStringLen f
+withCSPtrCArrayLen str = withPtrArrayLen str strToCStringLen
 {-# INLINE withCSPtrCArrayLen #-}
 
 withCSPtrCArray :: [String] -> (Int -> Ptr CString -> IO a) -> IO a
@@ -118,7 +118,7 @@ withBSPtrCArrayLen :: (Integral c, Storable c)
                    => [ByteString]
                    -> (Int -> Ptr (Ptr b) -> Ptr c -> IO a)
                    -> IO a
-withBSPtrCArrayLen str f = withPtrArrayLen str bsToCStringLen f
+withBSPtrCArrayLen str = withPtrArrayLen str bsToCStringLen
 {-# INLINE withBSPtrCArrayLen #-}
 
 withBSPtrCArray :: [ByteString] -> (Int -> Ptr CString -> IO a) -> IO a
