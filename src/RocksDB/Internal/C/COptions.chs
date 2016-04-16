@@ -22,8 +22,9 @@ import RocksDB.Internal.C.C2HS
 {#enum rocksdb_level_compaction as Compaction 
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show)#}
 
-{#fun rocksdb_options_create as c_rocksdb_options_create 
-    {} -> `OptionsFPtr' #}
+c_rocksdb_options_create :: IO OptionsFPtr
+c_rocksdb_options_create =
+    {#call rocksdb_options_create #} >>= newForeignPtr c_rocksdb_options_destroyF
 
 {#fun rocksdb_options_destroy as c_rocksdb_options_destroy 
     {`OptionsFPtr'} -> `()' #}
@@ -322,9 +323,10 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#enum rocksdb_block_based_table_index_type_binary_search as BlockBaseTableIndexSearchType 
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show) #}
 
-{#fun rocksdb_block_based_options_create as c_rocksdb_block_based_options_create 
-    {} -> `BlockBasedTableOptionsFPtr' #}
-
+c_rocksdb_block_based_options_create :: IO BlockBasedTableOptionsFPtr
+c_rocksdb_block_based_options_create =
+    {#call rocksdb_block_based_options_create #} >>= newForeignPtr c_rocksdb_block_based_options_destroyF
+    
 {#fun rocksdb_block_based_options_destroy as c_rocksdb_block_based_options_destroy 
     {`BlockBasedTableOptionsFPtr'} -> `()' #}
 
@@ -377,8 +379,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_block_based_options_destroy"
 -- Cuckoo table options
 ----------------------------------------------
 
-{#fun rocksdb_cuckoo_options_create as c_rocksdb_cuckoo_options_create 
-    {} -> `CuckooTableOptionsFPtr' #}
+c_rocksdb_cuckoo_options_create :: IO CuckooTableOptionsFPtr
+c_rocksdb_cuckoo_options_create =
+    {#call rocksdb_cuckoo_options_create #} >>= newForeignPtr c_rocksdb_cuckoo_options_destroyF
 
 {#fun rocksdb_cuckoo_options_destroy as c_rocksdb_cuckoo_options_destroy 
     {`CuckooTableOptionsFPtr'} -> `()' #}
@@ -411,8 +414,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_cuckoo_options_destroy"
 {#enum rocksdb_similar_size_compaction_stop_style as CompactionStopStyle 
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show) #}
 
-{#fun rocksdb_universal_compaction_options_create as c_rocksdb_universal_compaction_options_create 
-    {} -> `UniversalCompactionOptionsFPtr' #}
+c_rocksdb_universal_compaction_options_create :: IO UniversalCompactionOptionsFPtr
+c_rocksdb_universal_compaction_options_create =
+    {#call rocksdb_universal_compaction_options_create #} >>= newForeignPtr c_rocksdb_universal_compaction_options_destroyF
 
 {#fun rocksdb_universal_compaction_options_destroy as c_rocksdb_universal_compaction_options_destroy 
     {`UniversalCompactionOptionsFPtr'} -> `()' #}
@@ -442,9 +446,10 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_universal_compaction_options_des
 -- Universal Fifo options
 ----------------------------------------------
 
-{#fun rocksdb_fifo_compaction_options_create as c_rocksdb_fifo_compaction_options_create 
-    {} -> `FifoCompactionOptionsFPtr' #}
-
+c_rocksdb_fifo_compaction_options_create :: IO FifoCompactionOptionsFPtr
+c_rocksdb_fifo_compaction_options_create =
+    {#call rocksdb_fifo_compaction_options_create #} >>= newForeignPtr c_rocksdb_fifo_compaction_options_destroyF
+    
 {#fun rocksdb_fifo_compaction_options_destroy as c_rocksdb_fifo_compaction_options_destroy 
     {`FifoCompactionOptionsFPtr'} -> `()' #}
 
