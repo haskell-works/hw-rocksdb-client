@@ -131,7 +131,7 @@ type ColumnFamilyHandlePtr         = Ptr CColumnFamilyHandle
 -- Compaction Filter
 ----------------------------------------------
 
-type CompactionFilterCb = OpaquePtr     -- ^ state
+type CCompactionFilterCb = OpaquePtr   -- ^ state
                         -> CInt        -- ^ level
                         -> CString     -- ^ key
                         -> CSize       -- ^ key_length
@@ -143,12 +143,12 @@ type CompactionFilterCb = OpaquePtr     -- ^ state
                         -> IO CUChar
 
 foreign import ccall "wrapper" mkCompactFilterCb ::
-    CompactionFilterCb -> IO (FunPtr CompactionFilterCb)
+    CCompactionFilterCb -> IO (FunPtr CCompactionFilterCb)
 
 foreign import ccall safe "rocksdb/c.h rocksdb_compactionfilter_create"
     c_rocksdb_compactionfilter_create :: OpaquePtr
                                       -> FunPtr Destructor
-                                      -> FunPtr CompactionFilterCb
+                                      -> FunPtr CCompactionFilterCb
                                       -> FunPtr NameFun
                                       -> IO CompactionFilterPtr
 
@@ -172,17 +172,17 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_compactionfilter_destroy"
 -- Compaction Filter Factory
 ----------------------------------------------
 
-type CompactionFilterFactoryCb = OpaquePtr
-                              -> CompactionFilterContextPtr
-                              -> IO CompactionFilterPtr
+type CCompactionFilterFactoryCb = OpaquePtr
+                               -> CompactionFilterContextPtr
+                               -> IO CompactionFilterPtr
 
 foreign import ccall "wrapper" mkCompactFilterFactoryCb ::
-    CompactionFilterFactoryCb -> IO (FunPtr CompactionFilterFactoryCb)
+    CCompactionFilterFactoryCb -> IO (FunPtr CCompactionFilterFactoryCb)
 
 foreign import ccall safe "rocksdb/c.h rocksdb_compactionfilterfactory_create"
     c_rocksdb_compactionfilterfactory_create :: OpaquePtr
                                              -> FunPtr Destructor
-                                             -> FunPtr CompactionFilterFactoryCb
+                                             -> FunPtr CCompactionFilterFactoryCb
                                              -> FunPtr NameFun
                                              -> IO CompactionFilterFactoryPtr
 
@@ -216,30 +216,30 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_comparator_destroy"
 -- Filter policy
 ----------------------------------------------
 
-type CreateFilterCb = OpaquePtr
+type CCreateFilterCb = OpaquePtr
                     -> Ptr CString -- ^ key array
                     -> Ptr CSize   -- ^ key length array
                     -> CInt        -- ^ num keys
                     -> Ptr CSize   -- ^ filter length
                     -> IO CString  -- ^ the filter
-type KeyMayMatchCb = OpaquePtr
-                  -> CString     -- ^ key
-                  -> CSize       -- ^ key length
-                  -> CString     -- ^ filter
-                  -> CSize       -- ^ filter length
-                  -> IO CUChar   -- ^ whether key is in filter
+type CKeyMayMatchCb = OpaquePtr
+                   -> CString     -- ^ key
+                   -> CSize       -- ^ key length
+                   -> CString     -- ^ filter
+                   -> CSize       -- ^ filter length
+                   -> IO CUChar   -- ^ whether key is in filter
 
 -- | Make a FunPtr to a user-defined create_filter function
-foreign import ccall "wrapper" mkCreateFilterCb :: CreateFilterCb -> IO (FunPtr CreateFilterCb)
+foreign import ccall "wrapper" mkCreateFilterCb :: CCreateFilterCb -> IO (FunPtr CCreateFilterCb)
 
 -- | Make a FunPtr to a user-defined key_may_match function
-foreign import ccall "wrapper" mkKeyMayMatchCb :: KeyMayMatchCb -> IO (FunPtr KeyMayMatchCb)
+foreign import ccall "wrapper" mkKeyMayMatchCb :: CKeyMayMatchCb -> IO (FunPtr CKeyMayMatchCb)
 
 foreign import ccall safe "rocksdb/c.h rocksdb_filterpolicy_create"
   c_rocksdb_filterpolicy_create :: OpaquePtr
                                 -> FunPtr Destructor
-                                -> FunPtr CreateFilterCb
-                                -> FunPtr KeyMayMatchCb
+                                -> FunPtr CCreateFilterCb
+                                -> FunPtr CKeyMayMatchCb
                                 -> FunPtr NameFun
                                 -> IO FilterPolicyPtr
 
@@ -261,44 +261,44 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_filterpolicy_destroy"
 -- Merge Operator
 ----------------------------------------------
 
-type FullMergeCb = OpaquePtr
-                -> CString      -- ^ key
-                -> CSize        -- ^ key_length
-                -> CString      -- ^ existing_value
-                -> CSize        -- ^ existing_value_length
-                -> Ptr CString  -- ^ operands_list
-                -> Ptr CSize    -- ^ operands_list_length
-                -> CInt         -- ^ num_operands
-                -> Ptr CUChar   -- ^ success
-                -> Ptr CSize    -- ^ new_value_length
-                -> IO CString
+type CFullMergeCb = OpaquePtr
+                 -> CString      -- ^ key
+                 -> CSize        -- ^ key_length
+                 -> CString      -- ^ existing_value
+                 -> CSize        -- ^ existing_value_length
+                 -> Ptr CString  -- ^ operands_list
+                 -> Ptr CSize    -- ^ operands_list_length
+                 -> CInt         -- ^ num_operands
+                 -> Ptr CUChar   -- ^ success
+                 -> Ptr CSize    -- ^ new_value_length
+                 -> IO CString
 
-foreign import ccall "wrapper" mkFullMergeCb :: FullMergeCb -> IO (FunPtr FullMergeCb)
+foreign import ccall "wrapper" mkFullMergeCb :: CFullMergeCb -> IO (FunPtr CFullMergeCb)
 
-type PartialMergeCb = OpaquePtr
-                   -> CString      -- ^ key
-                   -> CSize        -- ^ key_length
-                   -> Ptr CString  -- ^ operands_list
-                   -> Ptr CSize    -- ^ operands_list_length
-                   -> CInt         -- ^ num_operands
-                   -> Ptr CUChar   -- ^ success
-                   -> Ptr CSize    -- ^ new_value_length
-                   -> IO CString
+type CPartialMergeCb = OpaquePtr
+                    -> CString      -- ^ key
+                    -> CSize        -- ^ key_length
+                    -> Ptr CString  -- ^ operands_list
+                    -> Ptr CSize    -- ^ operands_list_length
+                    -> CInt         -- ^ num_operands
+                    -> Ptr CUChar   -- ^ success
+                    -> Ptr CSize    -- ^ new_value_length
+                    -> IO CString
 
-foreign import ccall "wrapper" mkPatrialMergeCb :: PartialMergeCb -> IO (FunPtr PartialMergeCb)
+foreign import ccall "wrapper" mkPatrialMergeCb :: CPartialMergeCb -> IO (FunPtr CPartialMergeCb)
 
-type DeleteValueCb = OpaquePtr
-                  -> CString    -- ^ value
-                  -> CSize      -- ^ value_length
+type CDeleteValueCb = OpaquePtr
+                   -> CString    -- ^ value
+                   -> CSize      -- ^ value_length
 
-foreign import ccall "wrapper" mkMergeDeleteCb :: DeleteValueCb -> IO (FunPtr DeleteValueCb)
+foreign import ccall "wrapper" mkMergeDeleteCb :: CDeleteValueCb -> IO (FunPtr CDeleteValueCb)
 
 foreign import ccall safe "rocksdb/c.h rocksdb_mergeoperator_create"
     c_rocksdb_mergeoperator_create :: OpaquePtr
                                    -> FunPtr Destructor
-                                   -> FunPtr FullMergeCb
-                                   -> FunPtr PartialMergeCb
-                                   -> FunPtr DeleteValueCb
+                                   -> FunPtr CFullMergeCb
+                                   -> FunPtr CPartialMergeCb
+                                   -> FunPtr CDeleteValueCb
                                    -> FunPtr NameFun
                                    -> IO MergeOperatorPtr
 
@@ -395,7 +395,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_cache_destroy"
 -- Env
 ----------------------------------------------
 
-c_rocksdb_create_default_env :: IO EnvPtr
+c_rocksdb_create_default_env :: IO EnvFPtr
 c_rocksdb_create_default_env =
     {#call rocksdb_create_default_env #} >>= newForeignPtr c_rocksdb_env_destroyF
 
@@ -418,27 +418,27 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_env_destroy"
 -- SliceTransform
 ----------------------------------------------
 
-type TransformCb = OpaquePtr
-                -> CString     -- ^ key
-                -> CSize       -- ^ length
-                -> Ptr CSize   -- ^ dst_length
-                -> IO CString
+type CTransformCb = OpaquePtr
+                 -> CString     -- ^ key
+                 -> CSize       -- ^ length
+                 -> Ptr CSize   -- ^ dst_length
+                 -> IO CString
 
-type InDomainCb = OpaquePtr -> CString -> CSize -> IO CUChar
-type InRangeCb  = OpaquePtr -> CString -> CSize -> IO CUChar
+type CInDomainCb = OpaquePtr -> CString -> CSize -> IO CUChar
+type CInRangeCb  = OpaquePtr -> CString -> CSize -> IO CUChar
 
-foreign import ccall "wrapper" mkTransformCb :: TransformCb -> IO (FunPtr TransformCb)
+foreign import ccall "wrapper" mkTransformCb :: CTransformCb -> IO (FunPtr CTransformCb)
 
-foreign import ccall "wrapper" mkInDomainCb :: InDomainCb -> IO (FunPtr InDomainCb)
+foreign import ccall "wrapper" mkInDomainCb :: CInDomainCb -> IO (FunPtr CInDomainCb)
 
-foreign import ccall "wrapper" mkInRangeCb :: InRangeCb -> IO (FunPtr InRangeCb)
+foreign import ccall "wrapper" mkInRangeCb :: CInRangeCb -> IO (FunPtr CInRangeCb)
 
 foreign import ccall safe "rocksdb/c.h rocksdb_mergeoperator_create"
     rocksdb_slicetransform_create :: OpaquePtr
                                   -> FunPtr Destructor
-                                  -> FunPtr TransformCb
-                                  -> FunPtr InDomainCb
-                                  -> FunPtr InRangeCb
+                                  -> FunPtr CTransformCb
+                                  -> FunPtr CInDomainCb
+                                  -> FunPtr CInRangeCb
                                   -> FunPtr NameFun
                                   -> IO SliceTransformPtr
 
