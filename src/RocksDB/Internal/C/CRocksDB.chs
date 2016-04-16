@@ -14,21 +14,36 @@ import RocksDB.Internal.C.C2HS
 
 #include <rocksdb/c.h>
 
-{#fun rocksdb_open as c_rocksdb_open 
-    {`OptionsFPtr', `String', alloca- `Maybe String' peekStringMaybe*} -> `RocksDBFPtr' #}
+c_rocksdb_open :: OptionsFPtr -> String -> IO (Either String RocksDBFPtr)
+c_rocksdb_open o n =
+    withForeignPtr o $ \o' ->
+      withCString n $ \n' ->
+        alloca $ \era -> do
+          res  <- {#call rocksdb_open #} o' n' era
+          eitherFromError era (newForeignPtr_ res)
 
-{#fun rocksdb_open_for_read_only as c_rocksdb_open_for_read_only 
-    {`OptionsFPtr', `String', `Bool', alloca- `Maybe String' peekStringMaybe*} -> `RocksDBFPtr' #}
+c_rocksdb_open_for_read_only :: OptionsFPtr -> String -> ErrorIfLogExists -> IO (Either String RocksDBFPtr)
+c_rocksdb_open_for_read_only o n e =
+    withForeignPtr o $ \o' ->
+      withCString n $ \n' ->
+        alloca $ \era -> do
+          res <- {#call rocksdb_open_for_read_only #} o' n' (boolToNum e) era
+          eitherFromError era (newForeignPtr_ res)
 
-
-{#fun rocksdb_backup_engine_open as c_rocksdb_backup_engine_open 
-    {`OptionsFPtr', `String', alloca- `Maybe String' peekStringMaybe*} -> `BackupEngineFPtr' #}
+c_rocksdb_backup_engine_open :: OptionsFPtr -> String -> IO (Either String BackupEngineFPtr)
+c_rocksdb_backup_engine_open o n =
+    withForeignPtr o $ \o' ->
+      withCString n $ \n' ->
+        alloca $ \era -> do
+          res <- {#call rocksdb_backup_engine_open #} o' n' era
+          eitherFromError era (newForeignPtr_ res)
 
 {#fun rocksdb_backup_engine_create_new_backup as c_rocksdb_backup_engine_create_new_backup
     {`BackupEngineFPtr', `RocksDBFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
-{#fun rocksdb_restore_options_create as c_rocksdb_restore_options_create
-    {} -> `RestoreOptionsFPtr' #}
+c_rocksdb_restore_options_create :: IO RestoreOptionsFPtr
+c_rocksdb_restore_options_create =
+    {#call rocksdb_restore_options_create #} >>= newForeignPtr c_rocksdb_restore_options_destroyF
 
 {#fun rocksdb_restore_options_destroy as c_rocksdb_restore_options_destroy 
     {`RestoreOptionsFPtr'} -> `()' #}
@@ -43,8 +58,10 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_restore_options_destroy"
     {`BackupEngineFPtr', `String', `String', `RestoreOptionsFPtr', 
       alloca- `Maybe String' peekStringMaybe*}  -> `()' #}
 
-{#fun rocksdb_backup_engine_get_backup_info as c_rocksdb_backup_engine_get_backup_info 
-    {`BackupEngineFPtr'} -> `BackupEngineInfoFPtr' #}
+c_rocksdb_backup_engine_get_backup_info :: BackupEngineFPtr -> IO BackupEngineInfoFPtr
+c_rocksdb_backup_engine_get_backup_info be =
+    withForeignPtr be $ \be' ->
+      {#call rocksdb_backup_engine_get_backup_info #} be' >>= newForeignPtr c_rocksdb_backup_engine_info_destroyF
 
 {#fun rocksdb_backup_engine_info_count as c_rocksdb_backup_engine_info_count
     {`BackupEngineInfoFPtr'} -> `Int' #}
@@ -63,6 +80,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_restore_options_destroy"
 
 {#fun rocksdb_backup_engine_info_destroy as c_rocksdb_backup_engine_info_destroy
     {`BackupEngineInfoFPtr'} -> `()' #}
+    
+foreign import ccall safe "rocksdb/c.h &rocksdb_backup_engine_info_destroy"
+    c_rocksdb_backup_engine_info_destroyF :: FunPtr (BackupEngineInfoPtr -> IO ())
 
 {#fun rocksdb_backup_engine_close as c_rocksdb_backup_engine_close
     {`BackupEngineFPtr'} -> `()' #}
@@ -92,14 +112,11 @@ c_rocksdb_open_column_families dbo nm cfs =
                 alloca $ \chs -> do
                   db <- {#call rocksdb_open_column_families#} 
                             dbo' nm' (fromIntegral num) names' copts' chs era
-                  era'  <- peekStringMaybe era
-                  case era' of
-                      Just msg -> return $ Left msg
-                      Nothing -> do
-                        chs'  <- peekArray num chs
-                        chs'' <- mapM toCFHandle chs'
-                        db'   <- newForeignPtr_ db
-                        return $ Right (db', chs'')
+                  eitherFromError era $ do
+                    chs'  <- peekArray num chs
+                    chs'' <- mapM toCFHandle chs'
+                    db'   <- newForeignPtr_ db
+                    return (db', chs'')
 
 c_rocksdb_open_for_read_only_column_families :: OptionsFPtr
                                -> String
@@ -117,14 +134,11 @@ c_rocksdb_open_for_read_only_column_families dbo nm cfs e =
                 alloca $ \chs -> do
                   db <- {#call rocksdb_open_for_read_only_column_families#} 
                              dbo' nm' (fromIntegral num) names' copts' chs (boolToNum e) era
-                  era'  <- peekStringMaybe era
-                  case era' of
-                      Just msg -> return $ Left msg
-                      Nothing -> do
-                        chs'  <- peekArray num chs
-                        chs'' <- mapM toCFHandle chs'
-                        db'   <- newForeignPtr_ db
-                        return $ Right (db', chs'')
+                  eitherFromError era $ do
+                    chs'  <- peekArray num chs
+                    chs'' <- mapM toCFHandle chs'
+                    db'   <- newForeignPtr_ db
+                    return (db', chs'')
 
 c_rocksdb_list_column_families :: OptionsFPtr
                                -> String
@@ -135,14 +149,11 @@ c_rocksdb_list_column_families dbo nm =
         alloca $ \sz ->
         alloca $ \era -> do
           nma <- {#call rocksdb_list_column_families #} dbo' nm' sz era
-          era'  <- peekStringMaybe era
-          case era' of
-            Just msg -> return $ Left msg
-            Nothing -> do
-              sz'    <- peek sz
-              names  <- peekArray (cIntConv sz') nma
-              names' <- mapM peekCString names
-              return $ Right names'
+          eitherFromError era $ do
+            sz'    <- peek sz
+            names  <- peekArray (cIntConv sz') nma
+            names' <- mapM peekCString names
+            return names'
 
 c_rocksdb_create_column_family :: RocksDBFPtr
                                -> OptionsFPtr
@@ -153,12 +164,9 @@ c_rocksdb_create_column_family db copt nm =
       withCString nm $ \nm' ->
         alloca $ \era -> do
           cfn  <- {#call rocksdb_create_column_family #} db' copt' nm' era
-          era' <- peekStringMaybe era
-          case era' of
-            Just msg -> return $ Left msg
-            Nothing -> do
-              cfn' <- newForeignPtr c_rocksdb_column_family_handle_destroyF cfn
-              return $ Right cfn'
+          eitherFromError era $ do
+            cfn' <- newForeignPtr c_rocksdb_column_family_handle_destroyF cfn
+            return cfn'
           
 {#fun rocksdb_drop_column_family as c_rocksdb_drop_column_family 
     {`RocksDBFPtr', `ColumnFamilyHandleFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
@@ -268,11 +276,15 @@ c_rocksdb_multi_get_cf db ro ckp =
 -- Iterator
 ----------------------------------------------
 
-{#fun rocksdb_create_iterator as c_rocksdb_create_iterator
-    {`RocksDBFPtr', `ReadOptionsFPtr'} -> `IteratorFPtr' #}
+c_rocksdb_create_iterator :: RocksDBFPtr -> ReadOptionsFPtr -> IO IteratorFPtr
+c_rocksdb_create_iterator db op =
+    withForeignPtr2 db op $ \db' op' ->
+      {#call rocksdb_create_iterator #} db' op' >>= newForeignPtr c_rocksdb_iter_destroyF
 
-{#fun rocksdb_create_iterator_cf as c_rocksdb_create_iterator_cf
-    {`RocksDBFPtr', `ReadOptionsFPtr', `ColumnFamilyHandleFPtr'} -> `IteratorFPtr' #}
+c_rocksdb_create_iterator_cf :: RocksDBFPtr -> ReadOptionsFPtr -> ColumnFamilyHandleFPtr -> IO IteratorFPtr
+c_rocksdb_create_iterator_cf db op cf =
+    withForeignPtr3 db op cf $ \db' op' cf' ->
+      {#call rocksdb_create_iterator_cf #} db' op' cf' >>= newForeignPtr c_rocksdb_iter_destroyF
 
 ----------------------------------------------
 -- Property values
@@ -406,12 +418,17 @@ c_rocksdb_iter_value iter =
 -- Write batch
 ----------------------------------------------
 
-{#fun rocksdb_writebatch_create as c_rocksdb_writebatch_create {} -> `WriteBatchFPtr' #}
+c_rocksdb_writebatch_create :: IO WriteBatchFPtr
+c_rocksdb_writebatch_create = 
+  {#call rocksdb_writebatch_create #} >>= newForeignPtr c_rocksdb_writebatch_destroyF
 
 {#fun rocksdb_writebatch_create_from as c_rocksdb_writebatch_create_from 
     {bsToCStringLen* `ByteString'&} -> `WriteBatchFPtr' #}
 
 {#fun rocksdb_writebatch_destroy as c_rocksdb_writebatch_destroy {`WriteBatchFPtr'} -> `()' #}
+
+foreign import ccall safe "rocksdb/c.h &rocksdb_writebatch_destroy"
+    c_rocksdb_writebatch_destroyF :: FunPtr (WriteBatchPtr -> IO ())
 
 {#fun rocksdb_writebatch_clear as c_rocksdb_writebatch_clear {`WriteBatchFPtr'} -> `()' #}
 

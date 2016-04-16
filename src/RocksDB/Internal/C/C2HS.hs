@@ -139,6 +139,12 @@ withForeignPtr2 p1 p2 f =
     withForeignPtr p1 $ \p1' -> withForeignPtr p2 (f p1')
 {-# INLINE withForeignPtr2 #-}
 
+withForeignPtr3 :: ForeignPtr a -> ForeignPtr b -> ForeignPtr c -> (Ptr a -> Ptr b -> Ptr c -> IO d) -> IO d
+withForeignPtr3 p1 p2 p3 f =
+    withForeignPtr p1 $ \p1' ->
+        withForeignPtr2 p2 p3 $ \p2' p3' -> f p1' p2' p3'
+{-# INLINE withForeignPtr3 #-}
+
 withKeyValues :: (Integral c, Storable c)
               => [(ByteString, ByteString)]
               -> (Int -> Ptr CString -> Ptr c -> Ptr CString -> Ptr c -> IO a)
@@ -150,4 +156,11 @@ withKeyValues kvs f =
                 f num ksv kss vsv vss
 {-# INLINE withKeyValues #-}
 
+eitherFromError :: Ptr CString -> IO a -> IO (Either String a)
+eitherFromError era f = do
+    era' <- peekStringMaybe era
+    case era' of
+      Just msg -> return $ Left msg
+      Nothing -> Right <$> f
+{-# INLINE eitherFromError #-}
 

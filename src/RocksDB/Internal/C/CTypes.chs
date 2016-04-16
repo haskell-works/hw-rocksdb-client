@@ -243,12 +243,13 @@ foreign import ccall safe "rocksdb/c.h rocksdb_filterpolicy_create"
                                 -> FunPtr NameFun
                                 -> IO FilterPolicyPtr
 
-
-{#fun rocksdb_filterpolicy_create_bloom as c_rocksdb_filterpolicy_create_bloom
-    {`Int'} -> `FilterPolicyFPtr' #} 
-
-{#fun rocksdb_filterpolicy_create_bloom_full as c_rocksdb_filterpolicy_create_bloom_full
-    {`Int'} -> `FilterPolicyFPtr' #}
+c_rocksdb_filterpolicy_create_bloom :: Int -> IO FilterPolicyFPtr
+c_rocksdb_filterpolicy_create_bloom n =
+    {#call rocksdb_filterpolicy_create_bloom #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
+    
+c_rocksdb_filterpolicy_create_bloom_full :: Int -> IO FilterPolicyFPtr
+c_rocksdb_filterpolicy_create_bloom_full n =
+    {#call rocksdb_filterpolicy_create_bloom_full #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
 
 {#fun rocksdb_filterpolicy_destroy as c_rocksdb_filterpolicy_destroy
     {`FilterPolicyFPtr'} -> `()' #}
@@ -311,14 +312,15 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_mergeoperator_destroy"
 -- Read options 
 ----------------------------------------------
 
-{#fun rocksdb_readoptions_create as c_rocksdb_readoptions_create 
-    {} -> `ReadOptionsFPtr' #}
+c_rocksdb_readoptions_create :: IO ReadOptionsFPtr
+c_rocksdb_readoptions_create =
+    {#call rocksdb_readoptions_create #} >>= newForeignPtr c_rocksdb_readoptions_destroyF
 
 {#fun rocksdb_readoptions_destroy as c_rocksdb_readoptions_destroy
     {`ReadOptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &c_rocksdb_readoptions_destroy"
-    c_c_rocksdb_readoptions_destroyF :: FunPtr (ReadOptionsPtr -> IO ())
+    c_rocksdb_readoptions_destroyF :: FunPtr (ReadOptionsPtr -> IO ())
 
 {#fun rocksdb_readoptions_set_verify_checksums as c_rocksdb_readoptions_set_verify_checksums
     {`ReadOptionsFPtr', boolToNum `Bool'} -> `()' #}
@@ -342,8 +344,9 @@ foreign import ccall safe "rocksdb/c.h &c_rocksdb_readoptions_destroy"
 -- Write options
 ----------------------------------------------
 
-{#fun rocksdb_writeoptions_create as c_rocksdb_writeoptions_create 
-    {} -> `WriteOptionsFPtr' #}
+c_rocksdb_writeoptions_create :: IO WriteOptionsFPtr
+c_rocksdb_writeoptions_create =
+    {#call rocksdb_writeoptions_create #} >>= newForeignPtr c_rocksdb_writeoptions_destroyF
 
 {#fun rocksdb_writeoptions_destroy as c_rocksdb_writeoptions_destroy
     {`WriteOptionsFPtr'} -> `()' #}
@@ -361,8 +364,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_writeoptions_destroy"
 -- Flush options
 ----------------------------------------------
 
-{#fun rocksdb_flushoptions_create as c_rocksdb_flushoptions_create
-    {} -> `FlushOptionsFPtr' #}
+c_rocksdb_flushoptions_create :: IO FlushOptionsFPtr
+c_rocksdb_flushoptions_create =
+    {#call rocksdb_flushoptions_create #} >>= newForeignPtr c_rocksdb_flushoptions_destroyF
 
 {#fun rocksdb_flushoptions_destroy as c_rocksdb_flushoptions_destroy
     {`FlushOptionsFPtr'} -> `()' #}
@@ -377,8 +381,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_flushoptions_destroy"
 -- Cache
 ----------------------------------------------
 
-{#fun rocksdb_cache_create_lru as c_rocksdb_cache_create_lru
-    {cIntConv `CSize'} -> `CacheFPtr' #}
+c_rocksdb_cache_create_lru :: CSize -> IO CacheFPtr
+c_rocksdb_cache_create_lru sz =
+    {#call rocksdb_cache_create_lru #} (cIntConv sz) >>= newForeignPtr c_rocksdb_cache_destroyF
 
 {#fun rocksdb_cache_destroy as c_rocksdb_cache_destroy
     {`CacheFPtr'} -> `()' #}
@@ -390,8 +395,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_cache_destroy"
 -- Env
 ----------------------------------------------
 
-{#fun rocksdb_create_default_env as c_rocksdb_create_default_env
-    {} -> `EnvFPtr' #}
+c_rocksdb_create_default_env :: IO EnvPtr
+c_rocksdb_create_default_env =
+    {#call rocksdb_create_default_env #} >>= newForeignPtr c_rocksdb_env_destroyF
 
 {#fun rocksdb_env_destroy as c_rocksdb_env_destroy
     {`EnvFPtr'} -> `()' #}
@@ -436,11 +442,13 @@ foreign import ccall safe "rocksdb/c.h rocksdb_mergeoperator_create"
                                   -> FunPtr NameFun
                                   -> IO SliceTransformPtr
 
-{#fun rocksdb_slicetransform_create_fixed_prefix as c_rocksdb_slicetransform_create_fixed_prefix 
-    {cIntConv `CSize'} -> `SliceTransformFPtr' #}
+c_rocksdb_slicetransform_create_fixed_prefix :: CSize -> IO SliceTransformFPtr
+c_rocksdb_slicetransform_create_fixed_prefix sz =
+    {#call rocksdb_slicetransform_create_fixed_prefix #} (cIntConv sz) >>= newForeignPtr c_rocksdb_slicetransform_destroyF
 
-{#fun rocksdb_slicetransform_create_noop as c_rocksdb_slicetransform_create_noop 
-    {} -> `SliceTransformFPtr' #}
+c_rocksdb_slicetransform_create_noop :: IO SliceTransformFPtr
+c_rocksdb_slicetransform_create_noop =
+    {#call rocksdb_slicetransform_create_noop #} >>= newForeignPtr c_rocksdb_slicetransform_destroyF  
 
 {#fun rocksdb_slicetransform_destroy as c_rocksdb_slicetransform_destroy
     {`SliceTransformFPtr'} -> `()' #}
