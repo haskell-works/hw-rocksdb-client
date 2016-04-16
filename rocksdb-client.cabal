@@ -1,0 +1,88 @@
+name:                rocksdb-client
+version:             0.1.0
+synopsis:            Haskell client to RocksDB
+homepage:            http://github.com/haskell-works/rocksdb-client
+bug-reports:         http://github.com/haskell-works/rocksdb-client/issues
+license:             MIT
+license-file:        LICENSE
+author:              Alexey Raga <alexey.raga@gmail.com>
+maintainer:          Alexey Raga <alexey.raga@gmail.com>
+copyright:           Copyright (c) 2012-2016 Alexey Raga
+category:            Database
+stability:           Experimental
+build-type:          Simple
+cabal-version:       >=1.20
+description:
+ From <http://rocksdb.org>:
+ .
+ RocksDB is an embeddable persistent key-value store for fast storage. 
+ RocksDB can also be the foundation for a client-server database but our current focus is on embedded workloads.
+ .
+ RocksDB builds on LevelDB to be scalable to run on servers with many CPU cores, 
+ to efficiently use fast storage, to support IO-bound, in-memory and write-once workloads, 
+ and to be flexible to allow for innovation.
+
+extra-source-files:  README.md
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell-works/rocksdb-client.git
+
+Flag Examples
+  description:      Build examples
+  default:          False
+  manual:           True
+
+library
+  Build-tools:      c2hs
+  exposed-modules:  
+  other-modules:    RocksDB.Internal.C.C2HS
+                  , RocksDB.Internal.C.CTypes
+                  , RocksDB.Internal.C.COptions
+                  , RocksDB.Internal.C.CRocksDB
+  
+  default-language: Haskell2010
+
+  build-depends:    base >= 3 && < 5
+                  , bytestring
+                  , data-default
+                  , exceptions >= 0.6
+                  , filepath
+                  , resourcet > 0.3.2
+                  , transformers
+
+  ghc-options:      -Wall -rtsopts -funbox-strict-fields
+  ghc-prof-options: -prof -auto-all
+
+  hs-source-dirs:   src
+  
+  include-dirs:     /usr/local/include
+  extra-lib-dirs:   /usr/local/lib
+
+  extra-libraries:  rocksdb
+
+test-suite rocksdb-tests
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:   test
+
+  default-language: Haskell2010
+
+  build-depends:    base
+                  , bytestring
+                  , data-default
+                  , directory
+                  , exceptions       >= 0.6
+                  , mtl
+                  , rocksdb-client
+                  , QuickCheck       >= 2.7
+                  , tasty            >= 0.10
+                  , tasty-quickcheck >= 0.8
+                  , temporary
+                  , transformers
+
+  include-dirs:     /usr/local/include
+  extra-lib-dirs:   /usr/local/lib
+  extra-libraries:  rocksdb
+
+  ghc-options:      -Wall -O -rtsopts -threaded -with-rtsopts=-N
