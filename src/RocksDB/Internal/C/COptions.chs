@@ -16,17 +16,17 @@ import RocksDB.Internal.C.C2HS
 -- Options
 ----------------------------------------------
 
-{#enum rocksdb_no_compression as Compression 
+{#enum rocksdb_no_compression as Compression
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show) #}
 
-{#enum rocksdb_level_compaction as Compaction 
+{#enum rocksdb_level_compaction as Compaction
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show)#}
 
 c_rocksdb_options_create :: IO OptionsFPtr
 c_rocksdb_options_create =
     {#call rocksdb_options_create #} >>= newForeignPtr c_rocksdb_options_destroyF
 
-{#fun rocksdb_options_destroy as c_rocksdb_options_destroy 
+{#fun rocksdb_options_destroy as c_rocksdb_options_destroy
     {`OptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
@@ -320,59 +320,59 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 -- Block based table options
 ----------------------------------------------
 
-{#enum rocksdb_block_based_table_index_type_binary_search as BlockBaseTableIndexSearchType 
+{#enum rocksdb_block_based_table_index_type_binary_search as BlockBaseTableIndexSearchType
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show) #}
 
 c_rocksdb_block_based_options_create :: IO BlockBasedTableOptionsFPtr
 c_rocksdb_block_based_options_create =
     {#call rocksdb_block_based_options_create #} >>= newForeignPtr c_rocksdb_block_based_options_destroyF
-    
-{#fun rocksdb_block_based_options_destroy as c_rocksdb_block_based_options_destroy 
+
+{#fun rocksdb_block_based_options_destroy as c_rocksdb_block_based_options_destroy
     {`BlockBasedTableOptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_block_based_options_destroy"
     c_rocksdb_block_based_options_destroyF :: FunPtr (BlockBasedTableOptionsPtr -> IO ())
 
-{#fun rocksdb_block_based_options_set_block_size as c_rocksdb_block_based_options_set_block_size 
+{#fun rocksdb_block_based_options_set_block_size as c_rocksdb_block_based_options_set_block_size
     {`BlockBasedTableOptionsFPtr', cIntConv `CSize'} -> `()' #}
 
-{#fun rocksdb_block_based_options_set_block_size_deviation as c_rocksdb_block_based_options_set_block_size_deviation 
+{#fun rocksdb_block_based_options_set_block_size_deviation as c_rocksdb_block_based_options_set_block_size_deviation
     {`BlockBasedTableOptionsFPtr', `Int'} -> `()' #}
 
-{#fun rocksdb_block_based_options_set_block_restart_interval as c_rocksdb_block_based_options_set_block_restart_interval 
+{#fun rocksdb_block_based_options_set_block_restart_interval as c_rocksdb_block_based_options_set_block_restart_interval
     {`BlockBasedTableOptionsFPtr', `Int'} -> `()' #}
 
-{#fun rocksdb_block_based_options_set_filter_policy as c_rocksdb_block_based_options_set_filter_policy 
+{#fun rocksdb_block_based_options_set_filter_policy as c_rocksdb_block_based_options_set_filter_policy
     {`BlockBasedTableOptionsFPtr', `FilterPolicyFPtr'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_no_block_cache as c_rocksdb_block_based_options_set_no_block_cache 
+{#fun rocksdb_block_based_options_set_no_block_cache as c_rocksdb_block_based_options_set_no_block_cache
     {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_block_cache as c_rocksdb_block_based_options_set_block_cache 
+{#fun rocksdb_block_based_options_set_block_cache as c_rocksdb_block_based_options_set_block_cache
     {`BlockBasedTableOptionsFPtr', `CacheFPtr'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_block_cache_compressed as c_rocksdb_block_based_options_set_block_cache_compressed 
+{#fun rocksdb_block_based_options_set_block_cache_compressed as c_rocksdb_block_based_options_set_block_cache_compressed
     {`BlockBasedTableOptionsFPtr', `CacheFPtr'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_whole_key_filtering as c_rocksdb_block_based_options_set_whole_key_filtering 
+{#fun rocksdb_block_based_options_set_whole_key_filtering as c_rocksdb_block_based_options_set_whole_key_filtering
     {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_format_version as c_rocksdb_block_based_options_set_format_version 
+{#fun rocksdb_block_based_options_set_format_version as c_rocksdb_block_based_options_set_format_version
     {`BlockBasedTableOptionsFPtr', `Int'} -> `()' #}
 
-{#fun rocksdb_block_based_options_set_index_type as c_rocksdb_block_based_options_set_index_type 
+{#fun rocksdb_block_based_options_set_index_type as c_rocksdb_block_based_options_set_index_type
     {`BlockBasedTableOptionsFPtr',  enumToCInt `BlockBaseTableIndexSearchType'} -> `()' #}
 
-{#fun rocksdb_block_based_options_set_hash_index_allow_collision as c_rocksdb_block_based_options_set_hash_index_allow_collision 
+{#fun rocksdb_block_based_options_set_hash_index_allow_collision as c_rocksdb_block_based_options_set_hash_index_allow_collision
     {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_cache_index_and_filter_blocks as c_rocksdb_block_based_options_set_cache_index_and_filter_blocks 
+{#fun rocksdb_block_based_options_set_cache_index_and_filter_blocks as c_rocksdb_block_based_options_set_cache_index_and_filter_blocks
     {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_skip_table_builder_flush as c_rocksdb_block_based_options_set_skip_table_builder_flush 
+{#fun rocksdb_block_based_options_set_skip_table_builder_flush as c_rocksdb_block_based_options_set_skip_table_builder_flush
     {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
-{#fun rocksdb_options_set_block_based_table_factory as c_rocksdb_options_set_block_based_table_factory 
+{#fun rocksdb_options_set_block_based_table_factory as c_rocksdb_options_set_block_based_table_factory
     {`OptionsFPtr', `BlockBasedTableOptionsFPtr'} -> `()' #}
 
 ----------------------------------------------
@@ -383,7 +383,7 @@ c_rocksdb_cuckoo_options_create :: IO CuckooTableOptionsFPtr
 c_rocksdb_cuckoo_options_create =
     {#call rocksdb_cuckoo_options_create #} >>= newForeignPtr c_rocksdb_cuckoo_options_destroyF
 
-{#fun rocksdb_cuckoo_options_destroy as c_rocksdb_cuckoo_options_destroy 
+{#fun rocksdb_cuckoo_options_destroy as c_rocksdb_cuckoo_options_destroy
     {`CuckooTableOptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_cuckoo_options_destroy"
@@ -411,14 +411,14 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_cuckoo_options_destroy"
 -- Universal Compaction options
 ----------------------------------------------
 
-{#enum rocksdb_similar_size_compaction_stop_style as CompactionStopStyle 
+{#enum rocksdb_similar_size_compaction_stop_style as CompactionStopStyle
     {underscoreToCase} with prefix = "Rocksdb" deriving (Eq, Ord, Show) #}
 
 c_rocksdb_universal_compaction_options_create :: IO UniversalCompactionOptionsFPtr
 c_rocksdb_universal_compaction_options_create =
     {#call rocksdb_universal_compaction_options_create #} >>= newForeignPtr c_rocksdb_universal_compaction_options_destroyF
 
-{#fun rocksdb_universal_compaction_options_destroy as c_rocksdb_universal_compaction_options_destroy 
+{#fun rocksdb_universal_compaction_options_destroy as c_rocksdb_universal_compaction_options_destroy
     {`UniversalCompactionOptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_universal_compaction_options_destroy"
@@ -449,8 +449,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_universal_compaction_options_des
 c_rocksdb_fifo_compaction_options_create :: IO FifoCompactionOptionsFPtr
 c_rocksdb_fifo_compaction_options_create =
     {#call rocksdb_fifo_compaction_options_create #} >>= newForeignPtr c_rocksdb_fifo_compaction_options_destroyF
-    
-{#fun rocksdb_fifo_compaction_options_destroy as c_rocksdb_fifo_compaction_options_destroy 
+
+{#fun rocksdb_fifo_compaction_options_destroy as c_rocksdb_fifo_compaction_options_destroy
     {`FifoCompactionOptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_fifo_compaction_options_destroy"
@@ -458,4 +458,3 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_fifo_compaction_options_destroy"
 
 {#fun rocksdb_fifo_compaction_options_set_max_table_files_size as c_rocksdb_fifo_compaction_options_set_max_table_files_size
     {`FifoCompactionOptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
-

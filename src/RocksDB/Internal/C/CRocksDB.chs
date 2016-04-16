@@ -45,7 +45,7 @@ c_rocksdb_restore_options_create :: IO RestoreOptionsFPtr
 c_rocksdb_restore_options_create =
     {#call rocksdb_restore_options_create #} >>= newForeignPtr c_rocksdb_restore_options_destroyF
 
-{#fun rocksdb_restore_options_destroy as c_rocksdb_restore_options_destroy 
+{#fun rocksdb_restore_options_destroy as c_rocksdb_restore_options_destroy
     {`RestoreOptionsFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_restore_options_destroy"
@@ -55,7 +55,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_restore_options_destroy"
     {`RestoreOptionsFPtr', boolToNum `Bool'} -> `()' #}
 
 {#fun rocksdb_backup_engine_restore_db_from_latest_backup
-    {`BackupEngineFPtr', `String', `String', `RestoreOptionsFPtr', 
+    {`BackupEngineFPtr', `String', `String', `RestoreOptionsFPtr',
       alloca- `Maybe String' peekStringMaybe*}  -> `()' #}
 
 c_rocksdb_backup_engine_get_backup_info :: BackupEngineFPtr -> IO BackupEngineInfoFPtr
@@ -80,7 +80,7 @@ c_rocksdb_backup_engine_get_backup_info be =
 
 {#fun rocksdb_backup_engine_info_destroy as c_rocksdb_backup_engine_info_destroy
     {`BackupEngineInfoFPtr'} -> `()' #}
-    
+
 foreign import ccall safe "rocksdb/c.h &rocksdb_backup_engine_info_destroy"
     c_rocksdb_backup_engine_info_destroyF :: FunPtr (BackupEngineInfoPtr -> IO ())
 
@@ -91,7 +91,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_backup_engine_info_destroy"
 -- Column Families
 ----------------------------------------------
 
-{#fun rocksdb_column_family_handle_destroy as c_rocksdb_column_family_handle_destroy 
+{#fun rocksdb_column_family_handle_destroy as c_rocksdb_column_family_handle_destroy
     {`ColumnFamilyHandleFPtr'} -> `()' #}
 
 foreign import ccall safe "rocksdb/c.h &rocksdb_column_family_handle_destroy"
@@ -110,7 +110,7 @@ c_rocksdb_open_column_families dbo nm cfs =
               withFPtrArray copts $ \copts'->
                 alloca $ \era ->
                 alloca $ \chs -> do
-                  db <- {#call rocksdb_open_column_families#} 
+                  db <- {#call rocksdb_open_column_families#}
                             dbo' nm' (fromIntegral num) names' copts' chs era
                   eitherFromError era $ do
                     chs'  <- peekArray num chs
@@ -132,7 +132,7 @@ c_rocksdb_open_for_read_only_column_families dbo nm cfs e =
               withFPtrArray copts $ \copts'->
                 alloca $ \era ->
                 alloca $ \chs -> do
-                  db <- {#call rocksdb_open_for_read_only_column_families#} 
+                  db <- {#call rocksdb_open_for_read_only_column_families#}
                              dbo' nm' (fromIntegral num) names' copts' chs (boolToNum e) era
                   eitherFromError era $ do
                     chs'  <- peekArray num chs
@@ -167,8 +167,8 @@ c_rocksdb_create_column_family db copt nm =
           eitherFromError era $ do
             cfn' <- newForeignPtr c_rocksdb_column_family_handle_destroyF cfn
             return cfn'
-          
-{#fun rocksdb_drop_column_family as c_rocksdb_drop_column_family 
+
+{#fun rocksdb_drop_column_family as c_rocksdb_drop_column_family
     {`RocksDBFPtr', `ColumnFamilyHandleFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 ----------------------------------------------
@@ -179,65 +179,65 @@ c_rocksdb_create_column_family db copt nm =
     {`RocksDBFPtr'} -> `()' #}
 
 {#fun rocksdb_put as c_rocksdb_put
-    {`RocksDBFPtr', `WriteOptionsFPtr', 
-      bsToCStringLen* `ByteString'&, 
-      bsToCStringLen* `ByteString'&, 
+    {`RocksDBFPtr', `WriteOptionsFPtr',
+      bsToCStringLen* `ByteString'&,
+      bsToCStringLen* `ByteString'&,
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 {#fun rocksdb_put_cf as c_rocksdb_put_cf
-    {`RocksDBFPtr', `WriteOptionsFPtr', `ColumnFamilyHandleFPtr', 
-      bsToCStringLen* `ByteString'&, 
+    {`RocksDBFPtr', `WriteOptionsFPtr', `ColumnFamilyHandleFPtr',
+      bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&,
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 {#fun rocksdb_delete as c_rocksdb_delete
-    {`RocksDBFPtr', `WriteOptionsFPtr', 
-      bsToCStringLen* `ByteString'&, 
+    {`RocksDBFPtr', `WriteOptionsFPtr',
+      bsToCStringLen* `ByteString'&,
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 {#fun rocksdb_delete_cf as c_rocksdb_delete_cf
     {`RocksDBFPtr', `WriteOptionsFPtr',
-     `ColumnFamilyHandleFPtr', 
-      bsToCStringLen* `ByteString'&, 
+     `ColumnFamilyHandleFPtr',
+      bsToCStringLen* `ByteString'&,
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 {#fun rocksdb_merge as c_rocksdb_merge
-    {`RocksDBFPtr', `WriteOptionsFPtr', 
-      bsToCStringLen* `ByteString'&, 
+    {`RocksDBFPtr', `WriteOptionsFPtr',
+      bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&,
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 
 {#fun rocksdb_merge_cf as c_rocksdb_merge_cf
     {`RocksDBFPtr', `WriteOptionsFPtr',
-     `ColumnFamilyHandleFPtr', 
+     `ColumnFamilyHandleFPtr',
       bsToCStringLen* `ByteString'&,
-      bsToCStringLen* `ByteString'&, 
+      bsToCStringLen* `ByteString'&,
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 {#fun rocksdb_write as c_rocksdb_write
     {`RocksDBFPtr', `WriteOptionsFPtr',
-     `WriteBatchFPtr', 
+     `WriteBatchFPtr',
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
 {#fun rocksdb_get as c_rocksdb_get
-    {`RocksDBFPtr', `ReadOptionsFPtr', 
-      bsToCStringLen* `ByteString'&, 
+    {`RocksDBFPtr', `ReadOptionsFPtr',
+      bsToCStringLen* `ByteString'&,
       alloca- `CULong' peek*,
       alloca- `Maybe String' peekStringMaybe*} -> `CString' #}
 
 {#fun rocksdb_get_cf as c_rocksdb_get_cf
     {`RocksDBFPtr', `ReadOptionsFPtr',
-     `ColumnFamilyHandleFPtr', 
-      bsToCStringLen* `ByteString'&, 
+     `ColumnFamilyHandleFPtr',
+      bsToCStringLen* `ByteString'&,
       alloca- `CULong' peek*,
       alloca- `Maybe String' peekStringMaybe*} -> `CString' #}
 
-c_rocksdb_multi_get :: RocksDBFPtr 
-                    -> ReadOptionsFPtr 
-                    -> [ByteString] 
+c_rocksdb_multi_get :: RocksDBFPtr
+                    -> ReadOptionsFPtr
+                    -> [ByteString]
                     -> IO (([String], [ByteString]))
-c_rocksdb_multi_get db ro kp = 
+c_rocksdb_multi_get db ro kp =
     withBSPtrCArrayLen kp $ \num kva ksa ->
         withForeignPtr db $ \dbp ->
           withForeignPtr ro $ \rop ->
@@ -252,7 +252,7 @@ c_rocksdb_multi_get db ro kp =
                 bss  <- toBSLenArray (zip vva' vsa')
                 return (eras, bss)
 
-c_rocksdb_multi_get_cf :: RocksDBFPtr 
+c_rocksdb_multi_get_cf :: RocksDBFPtr
                        -> ReadOptionsFPtr
                        -> [(ColumnFamilyHandleFPtr, ByteString)]
                        -> IO (([String], [ByteString]))
@@ -310,7 +310,7 @@ c_rocksdb_create_iterator_cf db op cf =
 -- Approximation
 ----------------------------------------------
 
-c_rocksdb_approximate_sizes :: RocksDBFPtr 
+c_rocksdb_approximate_sizes :: RocksDBFPtr
                             -> [(ByteString, ByteString)] -- ^ (start, limit) keys
                             -> IO [CUInt64T]
 c_rocksdb_approximate_sizes db rs =
@@ -321,7 +321,7 @@ c_rocksdb_approximate_sizes db rs =
             sz' <- peekArray num sz
             return sz'
 
-c_rocksdb_approximate_sizes_cf :: RocksDBFPtr 
+c_rocksdb_approximate_sizes_cf :: RocksDBFPtr
                                -> ColumnFamilyHandleFPtr
                                -> [(ByteString, ByteString)]  -- ^ (start, limit) keys
                                -> IO [CUInt64T]
@@ -335,10 +335,10 @@ c_rocksdb_approximate_sizes_cf db cf rs =
 
 ----------------------------------------------
 
-{#fun rocksdb_compact_range as c_rocksdb_compact_range 
+{#fun rocksdb_compact_range as c_rocksdb_compact_range
     {`RocksDBFPtr', bsToCStringLen* `ByteString'&, bsToCStringLen* `ByteString'&} -> `()' #}
 
-{#fun rocksdb_compact_range_cf as c_rocksdb_compact_range_cf 
+{#fun rocksdb_compact_range_cf as c_rocksdb_compact_range_cf
     {`RocksDBFPtr', `ColumnFamilyHandleFPtr',
       bsToCStringLen* `ByteString'&,  bsToCStringLen* `ByteString'&} -> `()' #}
 
@@ -396,7 +396,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_iter_destroy"
     {`IteratorFPtr'} -> `()' #}
 
 c_rocksdb_iter_key :: IteratorFPtr -> IO (Maybe ByteString)
-c_rocksdb_iter_key iter = 
+c_rocksdb_iter_key iter =
     withForeignPtr iter $ \iter' ->
         alloca $ \sz -> do
             res <- {#call rocksdb_iter_key #} iter' sz
@@ -404,7 +404,7 @@ c_rocksdb_iter_key iter =
             toBSLenMaybe (res, fromIntegral sz')
 
 c_rocksdb_iter_value :: IteratorFPtr -> IO (Maybe ByteString)
-c_rocksdb_iter_value iter = 
+c_rocksdb_iter_value iter =
     withForeignPtr iter $ \iter' ->
         alloca $ \sz -> do
             res <- {#call rocksdb_iter_value #} iter' sz
@@ -419,10 +419,10 @@ c_rocksdb_iter_value iter =
 ----------------------------------------------
 
 c_rocksdb_writebatch_create :: IO WriteBatchFPtr
-c_rocksdb_writebatch_create = 
+c_rocksdb_writebatch_create =
   {#call rocksdb_writebatch_create #} >>= newForeignPtr c_rocksdb_writebatch_destroyF
 
-{#fun rocksdb_writebatch_create_from as c_rocksdb_writebatch_create_from 
+{#fun rocksdb_writebatch_create_from as c_rocksdb_writebatch_create_from
     {bsToCStringLen* `ByteString'&} -> `WriteBatchFPtr' #}
 
 {#fun rocksdb_writebatch_destroy as c_rocksdb_writebatch_destroy {`WriteBatchFPtr'} -> `()' #}
@@ -434,18 +434,18 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_writebatch_destroy"
 
 {#fun rocksdb_writebatch_count as c_rocksdb_writebatch_count {`WriteBatchFPtr'} -> `Int' #}
 
-{#fun rocksdb_writebatch_put as c_rocksdb_writebatch_put 
+{#fun rocksdb_writebatch_put as c_rocksdb_writebatch_put
     {`WriteBatchFPtr', bsToCStringLen* `ByteString'&, bsToCStringLen* `ByteString'&} -> `()' #}
 
 {#fun rocksdb_writebatch_put_cf as c_rocksdb_writebatch_put_cf
     {`WriteBatchFPtr', `ColumnFamilyHandleFPtr',
-      bsToCStringLen* `ByteString'&, 
+      bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&} -> `()' #}
 
 c_rocksdb_writebatch_putv :: WriteBatchFPtr
                           -> [(ByteString, ByteString)]
                           -> IO ()
-c_rocksdb_writebatch_putv b kvs = 
+c_rocksdb_writebatch_putv b kvs =
     withForeignPtr b $ \b' ->
         withKeyValues kvs $ \num ksv kss vsv vss ->
             {#call rocksdb_writebatch_putv #} b' (fromIntegral num) ksv kss (fromIntegral num) vsv vss
@@ -454,7 +454,7 @@ c_rocksdb_writebatch_putv_cf :: WriteBatchFPtr
                              -> ColumnFamilyHandleFPtr
                              -> [(ByteString, ByteString)]
                              -> IO ()
-c_rocksdb_writebatch_putv_cf b ch kvs = 
+c_rocksdb_writebatch_putv_cf b ch kvs =
     withForeignPtr2 b ch $ \b' ch' ->
         withKeyValues kvs $ \num ksv kss vsv vss ->
            {#call rocksdb_writebatch_putv_cf #} b' ch' (fromIntegral num) ksv kss (fromIntegral num) vsv vss
@@ -529,4 +529,3 @@ c_rocksdb_writebatch_data b =
            res <- {# call rocksdb_writebatch_data #} b' sz
            sz' <- peek sz
            toBSLen (res, fromIntegral sz')
-

@@ -39,7 +39,7 @@ data CCompactionFilter
 data CCompactionFilterContext
 data CCompactionFilterFactory
 data CComparator
-data CEnv 
+data CEnv
 data CFifoCompactionOptions
 data CFilelock
 data CFilterPolicy
@@ -159,17 +159,17 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_compactionfilter_destroy"
     c_rocksdb_compactionfilter_destroyF :: FunPtr (CompactionFilterFPtr -> IO ())
 
 ----------------------------------------------
--- Compaction Filter Context 
+-- Compaction Filter Context
 ----------------------------------------------
 
-{#fun rocksdb_compactionfiltercontext_is_full_compaction as c_rocksdb_compactionfiltercontext_is_full_compaction 
+{#fun rocksdb_compactionfiltercontext_is_full_compaction as c_rocksdb_compactionfiltercontext_is_full_compaction
     {`CompactionFilterContextFPtr'} -> `Bool' numToBool #}
 
-{#fun rocksdb_compactionfiltercontext_is_manual_compaction as c_rocksdb_compactionfiltercontext_is_manual_compaction 
+{#fun rocksdb_compactionfiltercontext_is_manual_compaction as c_rocksdb_compactionfiltercontext_is_manual_compaction
     {`CompactionFilterContextFPtr'} -> `Bool' numToBool #}
 
 ----------------------------------------------
--- Compaction Filter Factory 
+-- Compaction Filter Factory
 ----------------------------------------------
 
 type CompactionFilterFactoryCb = OpaquePtr
@@ -246,7 +246,7 @@ foreign import ccall safe "rocksdb/c.h rocksdb_filterpolicy_create"
 c_rocksdb_filterpolicy_create_bloom :: Int -> IO FilterPolicyFPtr
 c_rocksdb_filterpolicy_create_bloom n =
     {#call rocksdb_filterpolicy_create_bloom #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
-    
+
 c_rocksdb_filterpolicy_create_bloom_full :: Int -> IO FilterPolicyFPtr
 c_rocksdb_filterpolicy_create_bloom_full n =
     {#call rocksdb_filterpolicy_create_bloom_full #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
@@ -309,7 +309,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_mergeoperator_destroy"
     c_rocksdb_mergeoperator_destroyF :: FunPtr (MergeOperatorPtr -> IO ())
 
 ----------------------------------------------
--- Read options 
+-- Read options
 ----------------------------------------------
 
 c_rocksdb_readoptions_create :: IO ReadOptionsFPtr
@@ -374,7 +374,7 @@ c_rocksdb_flushoptions_create =
 foreign import ccall safe "rocksdb/c.h &rocksdb_flushoptions_destroy"
     c_rocksdb_flushoptions_destroyF :: FunPtr (FlushOptionsPtr -> IO ())
 
-{#fun rocksdb_flushoptions_set_wait as c_rocksdb_flushoptions_set_wait 
+{#fun rocksdb_flushoptions_set_wait as c_rocksdb_flushoptions_set_wait
     {`FlushOptionsFPtr', boolToNum `Bool'} -> `()' #}
 
 ----------------------------------------------
@@ -448,7 +448,7 @@ c_rocksdb_slicetransform_create_fixed_prefix sz =
 
 c_rocksdb_slicetransform_create_noop :: IO SliceTransformFPtr
 c_rocksdb_slicetransform_create_noop =
-    {#call rocksdb_slicetransform_create_noop #} >>= newForeignPtr c_rocksdb_slicetransform_destroyF  
+    {#call rocksdb_slicetransform_create_noop #} >>= newForeignPtr c_rocksdb_slicetransform_destroyF
 
 {#fun rocksdb_slicetransform_destroy as c_rocksdb_slicetransform_destroy
     {`SliceTransformFPtr'} -> `()' #}
@@ -488,6 +488,6 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_livefiles_destroy"
 -- Live files
 ----------------------------------------------
 
--- {#fun rocksdb_get_options_from_string as c_rocksdb_get_options_from_string 
---     {`OptionsFPtr', `String', `OptionsFPtr', 
+-- {#fun rocksdb_get_options_from_string as c_rocksdb_get_options_from_string
+--     {`OptionsFPtr', `String', `OptionsFPtr',
 --     rocksdb_options_t* new_options, char** errptr);
