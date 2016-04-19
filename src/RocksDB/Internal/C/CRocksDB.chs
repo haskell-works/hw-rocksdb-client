@@ -220,11 +220,22 @@ c_rocksdb_create_column_family db copt nm =
      `WriteBatchFPtr',
       alloca- `Maybe String' peekStringMaybe*} -> `()' #}
 
-{#fun rocksdb_get as c_rocksdb_get
-    {`RocksDBFPtr', `ReadOptionsFPtr',
-      bsToCStringLen* `ByteString'&,
-      alloca- `CULong' peek*,
-      alloca- `Maybe String' peekStringMaybe*} -> `CString' #}
+c_rocksdb_get :: RocksDBFPtr -> ReadOptionsFPtr -> ByteString -> IO (Either String ByteString)
+c_rocksdb_get db ro k = 
+    withForeignPtr2 db ro $ \db' ro' ->
+      bsToCStringLen k $ \(s, l) ->
+        alloca $ \sz ->
+        alloca $ \era -> do
+            res <- {#call rocksdb_get#} db' ro' s l sz era
+            eitherFromError era $ do
+              sz' <- peek sz
+              toBSLen (res, fromIntegral sz')
+             
+--{#fun rocksdb_get as c_rocksdb_get
+--    {`RocksDBFPtr', `ReadOptionsFPtr',
+--      bsToCStringLen* `ByteString'&,
+--      alloca- `CULong' peek*,
+--      alloca- `Maybe String' peekStringMaybe*} -> `CString' #}
 
 {#fun rocksdb_get_cf as c_rocksdb_get_cf
     {`RocksDBFPtr', `ReadOptionsFPtr',
