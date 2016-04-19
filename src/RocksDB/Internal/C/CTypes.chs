@@ -319,7 +319,7 @@ c_rocksdb_readoptions_create =
 {#fun rocksdb_readoptions_destroy as c_rocksdb_readoptions_destroy
     {`ReadOptionsFPtr'} -> `()' #}
 
-foreign import ccall safe "rocksdb/c.h &c_rocksdb_readoptions_destroy"
+foreign import ccall safe "rocksdb/c.h &rocksdb_readoptions_destroy"
     c_rocksdb_readoptions_destroyF :: FunPtr (ReadOptionsPtr -> IO ())
 
 {#fun rocksdb_readoptions_set_verify_checksums as c_rocksdb_readoptions_set_verify_checksums
