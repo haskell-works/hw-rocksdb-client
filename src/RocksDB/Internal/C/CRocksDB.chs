@@ -54,7 +54,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_restore_options_destroy"
 {#fun rocksdb_restore_options_set_keep_log_files as c_rocksdb_restore_options_set_keep_log_files
     {`RestoreOptionsFPtr', boolToNum `Bool'} -> `()' #}
 
-{#fun rocksdb_backup_engine_restore_db_from_latest_backup
+{#fun rocksdb_backup_engine_restore_db_from_latest_backup as c_rocksdb_backup_engine_restore_db_from_latest_backup 
     {`BackupEngineFPtr', `String', `String', `RestoreOptionsFPtr',
       alloca- `Maybe String' peekStringMaybe*}  -> `()' #}
 
