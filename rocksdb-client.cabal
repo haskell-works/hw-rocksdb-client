@@ -36,6 +36,7 @@ Flag Examples
 library
   Build-tools:      c2hs
   exposed-modules:  RocksDB.Internal.C 
+                  , RocksDB.Options
 
   other-modules:    RocksDB.Internal.C.C2HS
                   , RocksDB.Internal.C.CTypes
