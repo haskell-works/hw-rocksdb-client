@@ -22,6 +22,10 @@ instance Monoid WriteOptionsBuilder where
 createWriteOptions :: WriteOptionsBuilder -> IO WriteOptions
 createWriteOptions o = (WriteOptions <$> liftIO c_rocksdb_writeoptions_create) >>= runWriteOptions o
 
+-- | Creates new empty 'WriteOptions'
+defaultWriteOptions :: IO WriteOptions
+defaultWriteOptions = createWriteOptions mempty
+
 setSync :: Bool -> WriteOptionsBuilder
 setSync b = withWriteOptions $ flip c_rocksdb_writeoptions_set_sync b
 

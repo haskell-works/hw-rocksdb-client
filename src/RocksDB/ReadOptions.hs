@@ -16,6 +16,10 @@ instance Monoid ReadOptionsBuilder where
 createReadOptions :: ReadOptionsBuilder -> IO ReadOptions
 createReadOptions o = (ReadOptions <$> liftIO c_rocksdb_readoptions_create) >>= runReadOptions o
 
+-- | Creates new empty 'ReadOptions'
+defaultReadOptions :: IO ReadOptions
+defaultReadOptions = createReadOptions mempty
+
 setVerifyChecksums :: Bool -> ReadOptionsBuilder
 setVerifyChecksums b = withReadOptions $ flip c_rocksdb_readoptions_set_verify_checksums b
 
