@@ -3,8 +3,6 @@ module LowLevelSimple
 
 where
 
-import           Control.Exception
-import           Data.Maybe
 import           RocksDB.Internal.C as C
 import           RocksDB.Types
 import           System.Directory
