@@ -37,8 +37,8 @@ createOptions :: OptionsBuilder -> IO Options
 createOptions o = (Options <$> c_rocksdb_options_create) >>= runOptionsBuilder o
 
 -- | Creates new 'Options'
-defaultOptions :: IO Options
-defaultOptions = createOptions mempty
+defaultOptions :: OptionsBuilder
+defaultOptions = mempty
 
 setCompression :: Compression -> OptionsBuilder
 setCompression c =

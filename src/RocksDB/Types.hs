@@ -2,4 +2,4 @@ module RocksDB.Types
 
 where
 
-newtype RocksDBError = RocksDBError String
+newtype RocksDBError = RocksDBError String deriving (Show)

@@ -2,6 +2,7 @@ module RocksDB.WriteOptions
 ( WriteOptions(..)
 , WriteOptionsBuilder
 , createWriteOptions
+, defaultWriteOptions
 , setSync
 , disableWAL
 )
@@ -19,11 +20,11 @@ instance Monoid WriteOptionsBuilder where
     mempty = WriteOptionsBuilder return
     mappend a b = WriteOptionsBuilder (runWriteOptions a >=> runWriteOptions b)
 
-createWriteOptions :: WriteOptionsBuilder -> IO WriteOptions
-createWriteOptions o = (WriteOptions <$> liftIO c_rocksdb_writeoptions_create) >>= runWriteOptions o
+createWriteOptions :: MonadIO m => WriteOptionsBuilder -> m WriteOptions
+createWriteOptions o = liftIO $ (WriteOptions <$> liftIO c_rocksdb_writeoptions_create) >>= runWriteOptions o
 
 -- | Creates new empty 'WriteOptions'
-defaultWriteOptions :: IO WriteOptions
+defaultWriteOptions :: MonadIO m => m WriteOptions
 defaultWriteOptions = createWriteOptions mempty
 
 setSync :: Bool -> WriteOptionsBuilder

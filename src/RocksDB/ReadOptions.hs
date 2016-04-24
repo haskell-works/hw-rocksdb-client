@@ -1,5 +1,12 @@
 module RocksDB.ReadOptions
-
+( ReadOptions(..)
+, ReadOptionsBuilder
+, createReadOptions
+, defaultReadOptions
+, setVerifyChecksums
+, setFillCache
+, setTailing
+)
 where
 
 import           Control.Monad
@@ -13,11 +20,11 @@ instance Monoid ReadOptionsBuilder where
     mempty = ReadOptionsBuilder return
     mappend a b = ReadOptionsBuilder (runReadOptions a >=> runReadOptions b)
 
-createReadOptions :: ReadOptionsBuilder -> IO ReadOptions
-createReadOptions o = (ReadOptions <$> liftIO c_rocksdb_readoptions_create) >>= runReadOptions o
+createReadOptions :: MonadIO m => ReadOptionsBuilder -> m ReadOptions
+createReadOptions o = liftIO $ (ReadOptions <$> liftIO c_rocksdb_readoptions_create) >>= runReadOptions o
 
 -- | Creates new empty 'ReadOptions'
-defaultReadOptions :: IO ReadOptions
+defaultReadOptions :: MonadIO m => m ReadOptions
 defaultReadOptions = createReadOptions mempty
 
 setVerifyChecksums :: Bool -> ReadOptionsBuilder

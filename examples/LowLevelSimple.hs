@@ -11,10 +11,10 @@ import           System.Directory
 import           System.FilePath
 
 dbPath :: IO FilePath
-dbPath  = (</> "rocksdb_simple_example")       <$> getTemporaryDirectory
+dbPath  = (</> "rocksdb_ll_simple_example")       <$> getTemporaryDirectory
 
 bakPath :: IO FilePath
-bakPath = (</> "rocksdb_simple_example_bakup") <$> getTemporaryDirectory
+bakPath = (</> "rocksdb_ll_simple_example_bakup") <$> getTemporaryDirectory
 
 main :: IO ()
 main = do
