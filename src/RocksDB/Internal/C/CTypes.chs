@@ -30,7 +30,7 @@ type CInt32T  = {#type int32_t  #}
 type CUInt32T = {#type uint32_t #}
 type CUInt64T = {#type uint64_t #}
 
-data RocksDB
+data CRocksDB
 data CBackupEngine
 data CBackupEngineInfo
 data CRestoreOptions
@@ -62,7 +62,7 @@ data CUniversalCompactionOptions
 data CLiveFiles
 data CColumnFamilyHandle
 
-type RocksDBPtr                    = Ptr RocksDB
+type RocksDBPtr                    = Ptr CRocksDB
 type BackupEnginePtr               = Ptr CBackupEngine
 type BackupEngineInfoPtr           = Ptr CBackupEngineInfo
 type RestoreOptionsPtr             = Ptr CRestoreOptions
@@ -94,7 +94,7 @@ type UniversalCompactionOptionsPtr = Ptr CUniversalCompactionOptions
 type LiveFilesPtr                  = Ptr CLiveFiles
 type ColumnFamilyHandlePtr         = Ptr CColumnFamilyHandle
 
-{#pointer *rocksdb_t as RocksDBFPtr foreign -> RocksDB #}
+{#pointer *rocksdb_t as RocksDBFPtr foreign -> CRocksDB #}
 {#pointer *rocksdb_backup_engine_t as BackupEngineFPtr foreign -> CBackupEngine #}
 {#pointer *rocksdb_backup_engine_info_t as BackupEngineInfoFPtr foreign -> CBackupEngineInfo #}
 {#pointer *rocksdb_restore_options_t as RestoreOptionsFPtr foreign -> CRestoreOptions #}
@@ -358,7 +358,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_writeoptions_destroy"
     {`WriteOptionsFPtr', boolToNum `Bool'} -> `()' #}
 
 {#fun rocksdb_writeoptions_disable_WAL as c_rocksdb_writeoptions_disable_WAL
-    {`WriteOptionsFPtr', `Int'} -> `()' #}
+    {`WriteOptionsFPtr', boolToNum `Bool'} -> `()' #}
 
 ----------------------------------------------
 -- Flush options

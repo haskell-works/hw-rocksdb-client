@@ -10,11 +10,12 @@ import Foreign.C.String
 {#import RocksDB.Internal.C.CTypes#}
 import Data.ByteString (ByteString)
 
+import RocksDB.Types
 import RocksDB.Internal.C.C2HS
 
 #include <rocksdb/c.h>
 
-c_rocksdb_open :: OptionsFPtr -> String -> IO (Either String RocksDBFPtr)
+c_rocksdb_open :: OptionsFPtr -> String -> IO (Either RocksDBError RocksDBFPtr)
 c_rocksdb_open o n =
     withForeignPtr o $ \o' ->
       withCString n $ \n' ->
@@ -22,7 +23,7 @@ c_rocksdb_open o n =
           res  <- {#call rocksdb_open #} o' n' era
           eitherFromError era (newForeignPtr_ res)
 
-c_rocksdb_open_for_read_only :: OptionsFPtr -> String -> ErrorIfLogExists -> IO (Either String RocksDBFPtr)
+c_rocksdb_open_for_read_only :: OptionsFPtr -> String -> ErrorIfLogExists -> IO (Either RocksDBError RocksDBFPtr)
 c_rocksdb_open_for_read_only o n e =
     withForeignPtr o $ \o' ->
       withCString n $ \n' ->
@@ -30,7 +31,7 @@ c_rocksdb_open_for_read_only o n e =
           res <- {#call rocksdb_open_for_read_only #} o' n' (boolToNum e) era
           eitherFromError era (newForeignPtr_ res)
 
-c_rocksdb_backup_engine_open :: OptionsFPtr -> String -> IO (Either String BackupEngineFPtr)
+c_rocksdb_backup_engine_open :: OptionsFPtr -> String -> IO (Either RocksDBError BackupEngineFPtr)
 c_rocksdb_backup_engine_open o n =
     withForeignPtr o $ \o' ->
       withCString n $ \n' ->
@@ -39,7 +40,7 @@ c_rocksdb_backup_engine_open o n =
           eitherFromError era (newForeignPtr_ res)
 
 {#fun rocksdb_backup_engine_create_new_backup as c_rocksdb_backup_engine_create_new_backup
-    {`BackupEngineFPtr', `RocksDBFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`BackupEngineFPtr', `RocksDBFPtr', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 c_rocksdb_restore_options_create :: IO RestoreOptionsFPtr
 c_rocksdb_restore_options_create =
@@ -54,9 +55,9 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_restore_options_destroy"
 {#fun rocksdb_restore_options_set_keep_log_files as c_rocksdb_restore_options_set_keep_log_files
     {`RestoreOptionsFPtr', boolToNum `Bool'} -> `()' #}
 
-{#fun rocksdb_backup_engine_restore_db_from_latest_backup
+{#fun rocksdb_backup_engine_restore_db_from_latest_backup as c_rocksdb_backup_engine_restore_db_from_latest_backup 
     {`BackupEngineFPtr', `String', `String', `RestoreOptionsFPtr',
-      alloca- `Maybe String' peekStringMaybe*}  -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*}  -> `()' #}
 
 c_rocksdb_backup_engine_get_backup_info :: BackupEngineFPtr -> IO BackupEngineInfoFPtr
 c_rocksdb_backup_engine_get_backup_info be =
@@ -100,7 +101,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_column_family_handle_destroy"
 c_rocksdb_open_column_families :: OptionsFPtr
                                -> String
                                -> [(String, OptionsFPtr)]
-                               -> IO (Either String (RocksDBFPtr, [ColumnFamilyHandleFPtr]))
+                               -> IO (Either RocksDBError (RocksDBFPtr, [ColumnFamilyHandleFPtr]))
 c_rocksdb_open_column_families dbo nm cfs =
     let (names, copts) = unzip cfs
         toCFHandle = newForeignPtr c_rocksdb_column_family_handle_destroyF
@@ -122,7 +123,7 @@ c_rocksdb_open_for_read_only_column_families :: OptionsFPtr
                                -> String
                                -> [(String, OptionsFPtr)]
                                -> ErrorIfLogExists
-                               -> IO (Either String (RocksDBFPtr, [ColumnFamilyHandleFPtr]))
+                               -> IO (Either RocksDBError (RocksDBFPtr, [ColumnFamilyHandleFPtr]))
 c_rocksdb_open_for_read_only_column_families dbo nm cfs e =
     let (names, copts) = unzip cfs
         toCFHandle = newForeignPtr c_rocksdb_column_family_handle_destroyF
@@ -142,7 +143,7 @@ c_rocksdb_open_for_read_only_column_families dbo nm cfs e =
 
 c_rocksdb_list_column_families :: OptionsFPtr
                                -> String
-                               -> IO (Either String [String])
+                               -> IO (Either RocksDBError [String])
 c_rocksdb_list_column_families dbo nm =
     withForeignPtr dbo $ \dbo' ->
       withCString nm $ \nm' ->
@@ -158,7 +159,7 @@ c_rocksdb_list_column_families dbo nm =
 c_rocksdb_create_column_family :: RocksDBFPtr
                                -> OptionsFPtr
                                -> String
-                               -> IO (Either String ColumnFamilyHandleFPtr)
+                               -> IO (Either RocksDBError ColumnFamilyHandleFPtr)
 c_rocksdb_create_column_family db copt nm =
     withForeignPtr2 db copt $ \db' copt' ->
       withCString nm $ \nm' ->
@@ -169,7 +170,7 @@ c_rocksdb_create_column_family db copt nm =
             return cfn'
 
 {#fun rocksdb_drop_column_family as c_rocksdb_drop_column_family
-    {`RocksDBFPtr', `ColumnFamilyHandleFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`RocksDBFPtr', `ColumnFamilyHandleFPtr', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 ----------------------------------------------
 -- RocksDB General
@@ -182,30 +183,30 @@ c_rocksdb_create_column_family db copt nm =
     {`RocksDBFPtr', `WriteOptionsFPtr',
       bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&,
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_put_cf as c_rocksdb_put_cf
     {`RocksDBFPtr', `WriteOptionsFPtr', `ColumnFamilyHandleFPtr',
       bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&,
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_delete as c_rocksdb_delete
     {`RocksDBFPtr', `WriteOptionsFPtr',
       bsToCStringLen* `ByteString'&,
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_delete_cf as c_rocksdb_delete_cf
     {`RocksDBFPtr', `WriteOptionsFPtr',
      `ColumnFamilyHandleFPtr',
       bsToCStringLen* `ByteString'&,
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_merge as c_rocksdb_merge
     {`RocksDBFPtr', `WriteOptionsFPtr',
       bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&,
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 
 {#fun rocksdb_merge_cf as c_rocksdb_merge_cf
@@ -213,14 +214,14 @@ c_rocksdb_create_column_family db copt nm =
      `ColumnFamilyHandleFPtr',
       bsToCStringLen* `ByteString'&,
       bsToCStringLen* `ByteString'&,
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_write as c_rocksdb_write
     {`RocksDBFPtr', `WriteOptionsFPtr',
      `WriteBatchFPtr',
-      alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+      alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
-c_rocksdb_get :: RocksDBFPtr -> ReadOptionsFPtr -> ByteString -> IO (Either String ByteString)
+c_rocksdb_get :: RocksDBFPtr -> ReadOptionsFPtr -> ByteString -> IO (Either RocksDBError ByteString)
 c_rocksdb_get db ro k = 
     withForeignPtr2 db ro $ \db' ro' ->
       bsToCStringLen k $ \(s, l) ->
@@ -230,12 +231,6 @@ c_rocksdb_get db ro k =
             eitherFromError era $ do
               sz' <- peek sz
               toBSLen (res, fromIntegral sz')
-             
---{#fun rocksdb_get as c_rocksdb_get
---    {`RocksDBFPtr', `ReadOptionsFPtr',
---      bsToCStringLen* `ByteString'&,
---      alloca- `CULong' peek*,
---      alloca- `Maybe String' peekStringMaybe*} -> `CString' #}
 
 {#fun rocksdb_get_cf as c_rocksdb_get_cf
     {`RocksDBFPtr', `ReadOptionsFPtr',
@@ -360,23 +355,23 @@ c_rocksdb_approximate_sizes_cf db cf rs =
     {`RocksDBFPtr'} -> `LiveFilesFPtr' #}
 
 {#fun rocksdb_flush as c_rocksdb_flush
-    {`RocksDBFPtr', `FlushOptionsFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`RocksDBFPtr', `FlushOptionsFPtr', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_disable_file_deletions as c_rocksdb_disable_file_deletions
-    {`RocksDBFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`RocksDBFPtr', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_enable_file_deletions as c_rocksdb_enable_file_deletions
-    {`RocksDBFPtr', `Bool', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`RocksDBFPtr', `Bool', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 ----------------------------------------------
 -- Manage Operations
 ----------------------------------------------
 
 {#fun rocksdb_destroy_db as c_rocksdb_destroy_db
-    {`OptionsFPtr', `String', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`OptionsFPtr', `String', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 {#fun rocksdb_repair_db as c_rocksdb_repair_db
-    {`OptionsFPtr', `String', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`OptionsFPtr', `String', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 ----------------------------------------------
 -- Iterator (again)
@@ -423,7 +418,7 @@ c_rocksdb_iter_value iter =
             toBSLenMaybe (res, fromIntegral sz')
 
 {#fun rocksdb_iter_get_error as c_rocksdb_iter_get_error
-    {`IteratorFPtr', alloca- `Maybe String' peekStringMaybe*} -> `()' #}
+    {`IteratorFPtr', alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
 ----------------------------------------------
 -- Write batch

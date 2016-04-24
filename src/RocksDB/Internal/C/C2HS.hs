@@ -7,6 +7,7 @@ import           Data.ByteString  (ByteString, packCString, packCStringLen,
 import           Foreign
 import           Foreign.C.String
 import           Foreign.C.Types
+import           RocksDB.Types
 
 enumToCInt :: Enum a => a -> CInt
 enumToCInt = fromIntegral . fromEnum
@@ -156,9 +157,13 @@ withKeyValues kvs f =
                 f num ksv kss vsv vss
 {-# INLINE withKeyValues #-}
 
-eitherFromError :: Ptr CString -> IO a -> IO (Either String a)
+peekErrorMaybe :: Ptr CString -> IO (Maybe RocksDBError)
+peekErrorMaybe x = peekStringMaybe x >>= \m -> return $ RocksDBError <$> m
+{-# INLINE peekErrorMaybe #-}
+
+eitherFromError :: Ptr CString -> IO a -> IO (Either RocksDBError a)
 eitherFromError era f = do
-    era' <- peekStringMaybe era
+    era' <- peekErrorMaybe era
     case era' of
       Just msg -> return $ Left msg
       Nothing -> Right <$> f
