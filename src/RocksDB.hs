@@ -42,6 +42,10 @@ put (RocksDB _ r) (WriteOptions o) k v =
 get :: RocksDB -> ReadOptions -> ByteString -> RocksDBResult ByteString
 get (RocksDB _ r) (ReadOptions o) k =
     liftIO (c_rocksdb_get r o k) >>= hoistEither
+
+delete :: RocksDB -> WriteOptions -> ByteString -> RocksDBResult ()
+delete (RocksDB _ r) (WriteOptions o) k =
+    maybeErrorResult $ c_rocksdb_delete r o k
 -------------------------------------------------------------------------------
 maybeErrorResult :: MonadIO m => IO (Maybe a) -> ExceptT a m ()
 maybeErrorResult ma =
