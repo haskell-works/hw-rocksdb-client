@@ -77,4 +77,5 @@ setUseFsync b =
 --------------------------------------------------------------------------------
 withOptions :: (OptionsFPtr -> IO ()) -> Options
 withOptions f = Options $ \o -> f o >> return o
+{-# INLINE withOptions #-}
 

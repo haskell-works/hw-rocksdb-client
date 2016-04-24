@@ -1,12 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Simple
+module LowLevelSimple
 
 where
 
 import           Control.Exception
-import           Data.Either.Unwrap
 import           Data.Maybe
 import           RocksDB.Internal.C as C
+import           RocksDB.Types
 import           System.Directory
 import           System.FilePath
 
@@ -30,9 +30,7 @@ main = do
 
     -- Put key-value
     writeOpts <- c_rocksdb_writeoptions_create
-    _ <- c_rocksdb_put db writeOpts "Key" "Value" >>= \x -> do
-        print x
-        assertNoError x
+    _ <- c_rocksdb_put db writeOpts "Key" "Value" >>= assertNoError
 
     -- Get key-value
     readOpts <- c_rocksdb_readoptions_create
@@ -57,10 +55,10 @@ main = do
 
     print "All done"
 
-assertHasValue :: Either String b -> IO b
-assertHasValue = return . either error id
+assertHasValue :: Either RocksDBError b -> IO b
+assertHasValue = return . either (\(RocksDBError e) -> error e) id
 
-assertNoError :: Maybe String -> IO ()
-assertNoError = return . maybe () error
+assertNoError :: Maybe RocksDBError -> IO ()
+assertNoError = return . maybe () (\(RocksDBError e) -> error e)
 
 
