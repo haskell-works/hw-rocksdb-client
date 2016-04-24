@@ -19,15 +19,15 @@ data RocksDB = RocksDB OptionsFPtr RocksDBFPtr
 type RocksDBResult a = ExceptT RocksDBError IO a
 newtype ErrorIfExists = ErrorIfExists Bool
 
-open :: FilePath -> Options -> RocksDBResult RocksDB
+open :: FilePath -> OptionsBuilder -> RocksDBResult RocksDB
 open p o = do
-    opt <- liftIO $ createOptions o
+    (Options opt) <- liftIO $ createOptions o
     res <- liftIO $ c_rocksdb_open opt p
     hoistEither $ RocksDB opt <$> res
 
-openForReadOnly :: FilePath -> Options -> ErrorIfExists -> RocksDBResult RocksDB
+openForReadOnly :: FilePath -> OptionsBuilder -> ErrorIfExists -> RocksDBResult RocksDB
 openForReadOnly p o (ErrorIfExists e) = do
-    opt <- liftIO $ createOptions o
+    (Options opt) <- liftIO $ createOptions o
     res <- liftIO $ c_rocksdb_open_for_read_only opt p e
     hoistEither $ RocksDB opt <$> res
 

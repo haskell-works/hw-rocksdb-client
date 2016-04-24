@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 module RocksDB.Options
-( Options
+( Options(..)
+, OptionsBuilder
 , defaultOptions
 , createOptions
 , setCompaction
@@ -19,11 +20,12 @@ where
 import           Control.Monad
 import           RocksDB.Internal.C
 
-data Options = Options { runOptions :: OptionsFPtr -> IO OptionsFPtr }
+data Options = Options OptionsFPtr
+data OptionsBuilder = OptionsBuilder { runOptionsBuilder :: Options -> IO Options }
 
-instance Monoid Options where
-    mempty = Options return
-    mappend a b = Options (runOptions a >=> runOptions b)
+instance Monoid OptionsBuilder where
+    mempty = OptionsBuilder return
+    mappend a b = OptionsBuilder (runOptionsBuilder a >=> runOptionsBuilder b)
 
 -- | Creates 'Options' given a specification
 --
@@ -31,51 +33,51 @@ instance Monoid Options where
 --    dbOpts = createOptions $ setCompression NoCompression
 --                          <> setCompaction LevelCompaction
 -- @
-createOptions :: Options -> IO OptionsFPtr
-createOptions o = c_rocksdb_options_create >>= runOptions o
+createOptions :: OptionsBuilder -> IO Options
+createOptions o = (Options <$> c_rocksdb_options_create) >>= runOptionsBuilder o
 
 -- | Creates new 'Options'
-defaultOptions :: IO OptionsFPtr
+defaultOptions :: IO Options
 defaultOptions = createOptions mempty
 
-setCompression :: Compression -> Options
+setCompression :: Compression -> OptionsBuilder
 setCompression c =
-    withOptions $ flip c_rocksdb_options_set_compression c
+    withOptionsBuilder $ flip c_rocksdb_options_set_compression c
 
-setCompaction :: Compaction -> Options
+setCompaction :: Compaction -> OptionsBuilder
 setCompaction c =
-    withOptions $ flip c_rocksdb_options_set_compaction_style c
+    withOptionsBuilder $ flip c_rocksdb_options_set_compaction_style c
 
-setParallelism :: Int -> Options
+setParallelism :: Int -> OptionsBuilder
 setParallelism p =
-    withOptions $ flip c_rocksdb_options_increase_parallelism p
+    withOptionsBuilder $ flip c_rocksdb_options_increase_parallelism p
 
-setCreateIfMissing :: Bool -> Options
+setCreateIfMissing :: Bool -> OptionsBuilder
 setCreateIfMissing b =
-    withOptions $ flip c_rocksdb_options_set_create_if_missing b
+    withOptionsBuilder $ flip c_rocksdb_options_set_create_if_missing b
 
-setCreateMissingCF :: Bool -> Options
+setCreateMissingCF :: Bool -> OptionsBuilder
 setCreateMissingCF b =
-    withOptions $ flip c_rocksdb_options_set_create_missing_column_families b
+    withOptionsBuilder $ flip c_rocksdb_options_set_create_missing_column_families b
 
-setErrorIfExists :: Bool -> Options
+setErrorIfExists :: Bool -> OptionsBuilder
 setErrorIfExists b =
-    withOptions $ flip c_rocksdb_options_set_error_if_exists b
+    withOptionsBuilder $ flip c_rocksdb_options_set_error_if_exists b
 
-setParanoidChecks :: Bool -> Options
+setParanoidChecks :: Bool -> OptionsBuilder
 setParanoidChecks b =
-    withOptions $ flip c_rocksdb_options_set_paranoid_checks b
+    withOptionsBuilder $ flip c_rocksdb_options_set_paranoid_checks b
 
-setNumLevels :: Int -> Options
+setNumLevels :: Int -> OptionsBuilder
 setNumLevels n =
-    withOptions $ flip c_rocksdb_options_set_num_levels n
+    withOptionsBuilder $ flip c_rocksdb_options_set_num_levels n
 
-setUseFsync :: Int -> Options
+setUseFsync :: Int -> OptionsBuilder
 setUseFsync b =
-    withOptions $ flip c_rocksdb_options_set_use_fsync b
+    withOptionsBuilder $ flip c_rocksdb_options_set_use_fsync b
 
 --------------------------------------------------------------------------------
-withOptions :: (OptionsFPtr -> IO ()) -> Options
-withOptions f = Options $ \o -> f o >> return o
-{-# INLINE withOptions #-}
+withOptionsBuilder :: (OptionsFPtr -> IO ()) -> OptionsBuilder
+withOptionsBuilder f = OptionsBuilder $ \(Options o) -> f o >> return (Options o)
+{-# INLINE withOptionsBuilder #-}
 
