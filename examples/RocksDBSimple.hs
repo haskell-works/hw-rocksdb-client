@@ -28,10 +28,13 @@ runExample = runExceptT $ do
 
     put db wOpts "MyKey" "MyValue"
     res <- get db rOpts "MyKey"
-
     liftIO $ print (show res)
 
-    mres <- multiGet db rOpts ["MyKey", "noKey"]
+    nex <- get db rOpts "NexKey"
+    liftIO $ print $ "Nex: " ++ show nex
+
+
+    mres <- multiGet' db rOpts ["MyKey", "noKey"]
     liftIO $ print (show mres)
 
     close db

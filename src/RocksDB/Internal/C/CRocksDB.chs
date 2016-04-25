@@ -221,7 +221,7 @@ c_rocksdb_create_column_family db copt nm =
      `WriteBatchFPtr',
       alloca- `Maybe RocksDBError' peekErrorMaybe*} -> `()' #}
 
-c_rocksdb_get :: RocksDBFPtr -> ReadOptionsFPtr -> ByteString -> IO (Either RocksDBError ByteString)
+c_rocksdb_get :: RocksDBFPtr -> ReadOptionsFPtr -> ByteString -> IO (Either RocksDBError (Maybe ByteString))
 c_rocksdb_get db ro k = 
     withForeignPtr2 db ro $ \db' ro' ->
       bsToCStringLen k $ \(s, l) ->
@@ -230,7 +230,7 @@ c_rocksdb_get db ro k =
             res <- {#call rocksdb_get#} db' ro' s l sz era
             eitherFromError era $ do
               sz' <- peek sz
-              toBSLen (res, fromIntegral sz')
+              toBSLenMaybe (res, fromIntegral sz')
 
 {#fun rocksdb_get_cf as c_rocksdb_get_cf
     {`RocksDBFPtr', `ReadOptionsFPtr',
