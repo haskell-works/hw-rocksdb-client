@@ -242,7 +242,7 @@ c_rocksdb_get db ro k =
 c_rocksdb_multi_get :: RocksDBFPtr
                     -> ReadOptionsFPtr
                     -> [ByteString]
-                    -> IO (Either RocksDBError [ByteString])
+                    -> IO (Either RocksDBError [Maybe ByteString])
 c_rocksdb_multi_get db ro kp =
     withBSPtrCArrayLen kp $ \num kva ksa ->
         withForeignPtr db $ \dbp ->
@@ -254,12 +254,12 @@ c_rocksdb_multi_get db ro kp =
                 eitherFromError era $ do
                   vva' <- peekArray num vva
                   vsa' <- peekArray num vsa
-                  toBSLenArray (zip vva' vsa')
+                  toBSLenMaybeArray (zip vva' vsa')
 
 c_rocksdb_multi_get_cf :: RocksDBFPtr
                        -> ReadOptionsFPtr
                        -> [(ColumnFamilyHandleFPtr, ByteString)]
-                       -> IO (Either RocksDBError [ByteString])
+                       -> IO (Either RocksDBError [Maybe ByteString])
 c_rocksdb_multi_get_cf db ro ckp =
     let (chs, kp) = unzip ckp
     in withBSPtrCArrayLen kp $ \num kva ksa ->
@@ -272,7 +272,7 @@ c_rocksdb_multi_get_cf db ro ckp =
                 eitherFromError era $ do
                   vva' <- peekArray num vva
                   vsa' <- peekArray num vsa
-                  toBSLenArray (zip vva' vsa')
+                  toBSLenMaybeArray (zip vva' vsa')
 
 ----------------------------------------------
 -- Iterator

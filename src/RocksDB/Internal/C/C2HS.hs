@@ -75,6 +75,10 @@ toBSLenArray :: Integral c => [(Ptr b, c)] -> IO [ByteString]
 toBSLenArray = mapM $ packCStringLen . bimap castPtr cIntConv
 {-# INLINE toBSLenArray #-}
 
+toBSLenMaybeArray :: Integral c => [(Ptr b, c)] -> IO [Maybe ByteString]
+toBSLenMaybeArray = mapM $ toBSLenMaybe . bimap castPtr cIntConv
+{-# INLINE toBSLenMaybeArray #-}
+
 withSplitCArray :: (Integral c, Storable c)
                 => [(Ptr b, c)]
                 -> (Int -> Ptr (Ptr b) -> Ptr c -> IO a)

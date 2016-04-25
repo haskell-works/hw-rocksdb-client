@@ -43,7 +43,7 @@ get :: RocksDB -> ReadOptions -> ByteString -> RocksDBResult ByteString
 get (RocksDB _ r) (ReadOptions o) k =
     liftIO (c_rocksdb_get r o k) >>= hoistEither
 
-multiGet :: RocksDB -> ReadOptions -> [ByteString] -> RocksDBResult [ByteString]
+multiGet :: RocksDB -> ReadOptions -> [ByteString] -> RocksDBResult [Maybe ByteString]
 multiGet (RocksDB _ r) (ReadOptions o) ks =
     liftIO (c_rocksdb_multi_get r o ks) >>= hoistEither
 
