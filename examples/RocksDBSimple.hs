@@ -19,6 +19,7 @@ main :: IO ()
 main = runExample >>= (print . show)
 
 
+runExample :: IO (Either RocksDBError ())
 runExample = runExceptT $ do
     path  <- liftIO dbPath
     db    <- open path (setCreateIfMissing True)
@@ -30,11 +31,11 @@ runExample = runExceptT $ do
     res <- get db rOpts "MyKey"
     liftIO $ print (show res)
 
-    nex <- get db rOpts "NexKey"
-    liftIO $ print $ "Nex: " ++ show nex
-
-
     mres <- multiGet' db rOpts ["MyKey", "noKey"]
     liftIO $ print (show mres)
+
+    delete db wOpts "MyKey"
+    nex <- get db rOpts "MyKey"
+    liftIO $ print (show nex)
 
     close db
