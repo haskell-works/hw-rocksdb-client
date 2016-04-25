@@ -242,26 +242,24 @@ c_rocksdb_get db ro k =
 c_rocksdb_multi_get :: RocksDBFPtr
                     -> ReadOptionsFPtr
                     -> [ByteString]
-                    -> IO (([String], [ByteString]))
+                    -> IO (Either RocksDBError [ByteString])
 c_rocksdb_multi_get db ro kp =
     withBSPtrCArrayLen kp $ \num kva ksa ->
         withForeignPtr db $ \dbp ->
           withForeignPtr ro $ \rop ->
-            alloca $ \(vva :: Ptr (Ptr CChar)) ->
+            alloca $ \vva ->
             alloca $ \vsa ->
             alloca $ \era -> do
                 {#call rocksdb_multi_get #} dbp rop (fromIntegral num) kva ksa vva vsa era
-                vva' <- peekArray num vva
-                vsa' <- peekArray num vsa
-                era' <- peekArray num era
-                eras <- mapM peekCAString era'
-                bss  <- toBSLenArray (zip vva' vsa')
-                return (eras, bss)
+                eitherFromError era $ do
+                  vva' <- peekArray num vva
+                  vsa' <- peekArray num vsa
+                  toBSLenArray (zip vva' vsa')
 
 c_rocksdb_multi_get_cf :: RocksDBFPtr
                        -> ReadOptionsFPtr
                        -> [(ColumnFamilyHandleFPtr, ByteString)]
-                       -> IO (([String], [ByteString]))
+                       -> IO (Either RocksDBError [ByteString])
 c_rocksdb_multi_get_cf db ro ckp =
     let (chs, kp) = unzip ckp
     in withBSPtrCArrayLen kp $ \num kva ksa ->
@@ -271,12 +269,10 @@ c_rocksdb_multi_get_cf db ro ckp =
             alloca $ \vsa ->
             alloca $ \era -> do
                 {#call rocksdb_multi_get_cf #} dbp rop chl (fromIntegral num) kva ksa vva vsa era
-                vva' <- peekArray num vva
-                vsa' <- peekArray num vsa
-                era' <- peekArray num era
-                eras <- mapM peekCAString era'
-                bss  <- toBSLenArray (zip vva' vsa')
-                return (eras, bss)
+                eitherFromError era $ do
+                  vva' <- peekArray num vva
+                  vsa' <- peekArray num vsa
+                  toBSLenArray (zip vva' vsa')
 
 ----------------------------------------------
 -- Iterator

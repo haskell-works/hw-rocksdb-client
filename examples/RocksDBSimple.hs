@@ -31,4 +31,7 @@ runExample = runExceptT $ do
 
     liftIO $ print (show res)
 
+    mres <- multiGet db rOpts ["MyKey", "noKey"]
+    liftIO $ print (show mres)
+
     close db
