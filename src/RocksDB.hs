@@ -7,6 +7,7 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
 import           Data.ByteString            (ByteString)
+import           Data.Maybe
 import           RocksDB.Internal.C
 import           RocksDB.Options
 import           RocksDB.ReadOptions
@@ -46,6 +47,11 @@ get (RocksDB _ r) (ReadOptions o) k =
 multiGet :: RocksDB -> ReadOptions -> [ByteString] -> RocksDBResult [Maybe ByteString]
 multiGet (RocksDB _ r) (ReadOptions o) ks =
     liftIO (c_rocksdb_multi_get r o ks) >>= hoistEither
+
+multiGet' :: RocksDB -> ReadOptions -> [ByteString] -> RocksDBResult [(ByteString, ByteString)]
+multiGet' r o ks = do
+    res <- multiGet r o ks
+    return [(k, fromJust v) | (k, v) <- zip ks res, isJust v]
 
 delete :: RocksDB -> WriteOptions -> ByteString -> RocksDBResult ()
 delete (RocksDB _ r) (WriteOptions o) k =
