@@ -113,6 +113,8 @@ test-suite rocksdb-tests
   hs-source-dirs:   test
 
   default-language: Haskell2010
+  
+  other-modules:    Integration.SimpleSpec
 
   build-depends:    QuickCheck       >= 2.7
                   , base
@@ -121,6 +123,8 @@ test-suite rocksdb-tests
                   , directory
                   , errors
                   , exceptions       >= 0.6
+                  , filepath
+                  , hspec
                   , mtl
                   , rocksdb-client
                   , tasty            >= 0.10
