@@ -29,6 +29,6 @@ dependencies:
 test:
   pre:
   override:
-    - echo "no tests"
+    - stack test
   post:
     - find . -path "*/test-reports/*" -exec mv {} ${CIRCLE_TEST_REPORTS} \;
