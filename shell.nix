@@ -14,10 +14,8 @@ stdenv.mkDerivation {
     ];
    
 
-#  STACK_IN_NIX_EXTRA_ARGS
-#      = " --extra-lib-dirs=${glpk}/lib" 
-#      + " --extra-include-dirs=${glpk}/include" 
-#      + " --extra-lib-dirs=${pcre}/lib" 
-#      + " --extra-include-dirs=${pcre}/include"
-#  ;
+  STACK_IN_NIX_EXTRA_ARGS
+      = " --extra-lib-dirs=${rocksdb}/lib" 
+      + " --extra-include-dirs=${rocksdb}/include" 
+  ;
 }
