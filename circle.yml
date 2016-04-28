@@ -1,7 +1,6 @@
 machine:
   post:
     - curl https://nixos.org/nix/install | sh
-    - . $HOME/.nix-profile/etc/profile.d/nix.sh
 dependencies:
   cache_directories:
     - "~/.stack"
@@ -26,6 +25,7 @@ dependencies:
     - cd ~/rocksdb && sudo make install
     
   override:
+    - . $HOME/.nix-profile/etc/profile.d/nix.sh
     - stack setup
     - stack clean
     - stack build
