@@ -4,12 +4,12 @@ stdenv.mkDerivation {
 
   name = "myEnv";
 
-  buildInputs = if builtins.getEnv "CI" != "" 
+  buildInputs = if builtins.getEnv "CI" == "true" 
     then [
+      rocksdb
       haskell.packages.lts-5_9.ghc
     ]
     else [
-      rocksdb
       haskell.packages.lts-5_9.ghc
     ];
    
