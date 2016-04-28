@@ -25,14 +25,11 @@ dependencies:
     - cd ~/rocksdb && sudo make install
     
   override:
-    - . $HOME/.nix-profile/etc/profile.d/nix.sh
-    - stack setup
-    - stack clean
-    - stack build
+    - ./circle.build/stack-build.sh
 
 test:
   pre:
   override:
-    - LD_LIBRARY_PATH=/usr/local/lib stack test
+    - ./circle.build/stack-test.sh
   post:
     - find . -path "*/test-reports/*" -exec mv {} ${CIRCLE_TEST_REPORTS} \;
