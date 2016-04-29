@@ -63,10 +63,9 @@ library
 
   hs-source-dirs:   src
   
-  include-dirs:     /usr/local/include
-  extra-lib-dirs:   /usr/local/lib
-
-  extra-libraries:  rocksdb
+  --include-dirs:     /usr/local/include
+  --extra-lib-dirs:   /usr/local/lib
+  --extra-libraries:  rocksdb
   
 executable rocksdb-simple
   hs-source-dirs:   examples
@@ -132,8 +131,8 @@ test-suite rocksdb-tests
                   , temporary
                   , transformers
 
-  include-dirs:     /usr/local/include
-  extra-lib-dirs:   /usr/local/lib
+  --include-dirs:     /usr/local/include
+  --extra-lib-dirs:   /usr/local/lib
   extra-libraries:  rocksdb
 
   ghc-options:      -Wall -O -rtsopts -threaded -with-rtsopts=-N
