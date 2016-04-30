@@ -247,9 +247,9 @@ c_rocksdb_filterpolicy_create_bloom :: Int -> IO FilterPolicyFPtr
 c_rocksdb_filterpolicy_create_bloom n =
     {#call rocksdb_filterpolicy_create_bloom #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
 
-c_rocksdb_filterpolicy_create_bloom_full :: Int -> IO FilterPolicyFPtr
-c_rocksdb_filterpolicy_create_bloom_full n =
-    {#call rocksdb_filterpolicy_create_bloom_full #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
+--c_rocksdb_filterpolicy_create_bloom_full :: Int -> IO FilterPolicyFPtr
+--c_rocksdb_filterpolicy_create_bloom_full n =
+--    {#call rocksdb_filterpolicy_create_bloom_full #} (cIntConv n) >>= newForeignPtr c_rocksdb_filterpolicy_destroyF
 
 {#fun rocksdb_filterpolicy_destroy as c_rocksdb_filterpolicy_destroy
     {`FilterPolicyFPtr'} -> `()' #}
