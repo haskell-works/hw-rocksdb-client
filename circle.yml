@@ -4,25 +4,11 @@ machine:
 dependencies:
   cache_directories:
     - "~/.stack"
-    - "~/rocksdb"
     
   pre:
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 10
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 10
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 20
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 20
-    - sudo apt-get update; sudo apt-get install libgflags-dev libsnappy-dev
     - wget https://github.com/commercialhaskell/stack/releases/download/v1.0.4/stack-1.0.4-linux-x86_64.tar.gz -O /tmp/stack.tar.gz
     - tar -C /tmp -xf /tmp/stack.tar.gz && chmod +x /tmp/stack-*/stack
     - sudo mv /tmp/stack-*/stack /usr/bin/stack
-    - |
-      if [[ ! -e ~/rocksdb ]]; then
-        git clone --depth 1 https://github.com/facebook/rocksdb ~/rocksdb
-        cd ~/rocksdb
-        make static_lib
-        make shared_lib
-      fi
-    - cd ~/rocksdb && sudo make install
     
   override:
     - ./circle.build/stack-build.sh
