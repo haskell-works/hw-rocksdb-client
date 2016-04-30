@@ -162,8 +162,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#fun rocksdb_options_set_keep_log_file_num as c_rocksdb_options_set_keep_log_file_num
     {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
 
-{#fun rocksdb_options_set_recycle_log_file_num as c_rocksdb_options_set_recycle_log_file_num
-    {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
+--{#fun rocksdb_options_set_recycle_log_file_num as c_rocksdb_options_set_recycle_log_file_num
+--    {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
 
 {#fun rocksdb_options_set_soft_rate_limit as c_rocksdb_options_set_soft_rate_limit
     {`OptionsFPtr', `Double'} -> `()' #}
@@ -282,8 +282,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#fun rocksdb_options_set_memtable_prefix_bloom_probes as c_rocksdb_options_set_memtable_prefix_bloom_probes
     {`OptionsFPtr', cIntConv `CUInt32T'} -> `()' #}
 
-{#fun rocksdb_options_set_memtable_prefix_bloom_huge_page_tlb_size as c_rocksdb_options_set_memtable_prefix_bloom_huge_page_tlb_size
-    {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
+--{#fun rocksdb_options_set_memtable_prefix_bloom_huge_page_tlb_size as c_rocksdb_options_set_memtable_prefix_bloom_huge_page_tlb_size
+--    {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
 
 {#fun rocksdb_options_set_max_successive_merges as c_rocksdb_options_set_max_successive_merges
     {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
@@ -369,8 +369,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_block_based_options_destroy"
 {#fun rocksdb_block_based_options_set_cache_index_and_filter_blocks as c_rocksdb_block_based_options_set_cache_index_and_filter_blocks
     {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
-{#fun rocksdb_block_based_options_set_skip_table_builder_flush as c_rocksdb_block_based_options_set_skip_table_builder_flush
-    {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
+--{#fun rocksdb_block_based_options_set_skip_table_builder_flush as c_rocksdb_block_based_options_set_skip_table_builder_flush
+--    {`BlockBasedTableOptionsFPtr', boolToNum `Bool'} -> `()'  #}
 
 {#fun rocksdb_options_set_block_based_table_factory as c_rocksdb_options_set_block_based_table_factory
     {`OptionsFPtr', `BlockBasedTableOptionsFPtr'} -> `()' #}
