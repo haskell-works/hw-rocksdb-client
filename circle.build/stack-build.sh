@@ -4,4 +4,4 @@
 
 stack setup
 stack clean
-stack build
+stack build --test --no-run-tests
