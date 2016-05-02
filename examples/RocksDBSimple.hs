@@ -7,7 +7,6 @@ import           Control.Monad.Trans.Except
 import           RocksDB
 import           RocksDB.Options
 import           RocksDB.ReadOptions
-import           RocksDB.Types
 import           RocksDB.WriteOptions
 import           System.Directory
 import           System.FilePath

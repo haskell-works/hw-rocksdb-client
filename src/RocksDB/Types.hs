@@ -8,6 +8,7 @@ import           RocksDB.Internal.C
 import           RocksDB.Internal.Types
 import           Control.Monad.Trans.Except
 
+newtype ErrorIfExists = ErrorIfExists Bool
 
 data RocksDB = RocksDB OptionsFPtr RocksDBFPtr
 

@@ -47,6 +47,8 @@ library
                   , RocksDB.Internal.C.CTypes
                   , RocksDB.Internal.C.COptions
                   , RocksDB.Internal.C.CRocksDB
+                  , RocksDB.Basics
+                  , RocksDB.Iterator
 
   default-language: Haskell2010
 
@@ -86,6 +88,8 @@ executable rocksdb-simple
     buildable:      True
   else
     buildable:      False
+
+  extra-libraries:  rocksdb
   
 executable rocksdb-low-level-simple
   hs-source-dirs:   examples
@@ -105,6 +109,8 @@ executable rocksdb-low-level-simple
     buildable:      True
   else
     buildable:      False
+
+  extra-libraries:  rocksdb
   
 
 test-suite rocksdb-tests
