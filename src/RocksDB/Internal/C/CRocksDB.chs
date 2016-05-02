@@ -10,7 +10,7 @@ import Foreign.C.String
 {#import RocksDB.Internal.C.CTypes#}
 import Data.ByteString (ByteString)
 
-import RocksDB.Types
+import RocksDB.Internal.Types
 import RocksDB.Internal.C.C2HS
 
 #include <rocksdb/c.h>

@@ -15,9 +15,6 @@ import           RocksDB.Types
 import           RocksDB.WriteOptions
 import           System.FilePath
 
-data RocksDB = RocksDB OptionsFPtr RocksDBFPtr
-
-type RocksDBResult a = ExceptT RocksDBError IO a
 newtype ErrorIfExists = ErrorIfExists Bool
 
 -- | Opens a RocksDB database with a given path and options

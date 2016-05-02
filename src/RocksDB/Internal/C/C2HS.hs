@@ -7,7 +7,8 @@ import           Data.ByteString  (ByteString, packCString, packCStringLen,
 import           Foreign
 import           Foreign.C.String
 import           Foreign.C.Types
-import           RocksDB.Types
+
+import           RocksDB.Internal.Types
 
 enumToCInt :: Enum a => a -> CInt
 enumToCInt = fromIntegral . fromEnum

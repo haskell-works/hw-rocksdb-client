@@ -9,6 +9,7 @@ import Foreign.C.String
 import Data.ByteString
 
 import RocksDB.Internal.C.C2HS
+import RocksDB.Internal.Types
 
 #include <rocksdb/c.h>
 
@@ -197,6 +198,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_compactionfilterfactory_destroy"
 ----------------------------------------------
 
 type CompareFun = OpaquePtr -> CString -> CSize -> CString -> CSize -> IO CInt
+
+
 
 foreign import ccall safe "rocksdb/c.h rocksdb_comparator_create"
   c_rocksdb_comparator_create :: OpaquePtr
