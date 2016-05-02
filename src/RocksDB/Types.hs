@@ -1,5 +1,7 @@
 module RocksDB.Types
-
+( module RocksDB.Internal.Types
+, module RocksDB.Types
+)
 where
 
 import           RocksDB.Internal.C

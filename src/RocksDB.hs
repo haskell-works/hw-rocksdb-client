@@ -1,5 +1,4 @@
 module RocksDB
-
 where
 
 import           Control.Error.Util
