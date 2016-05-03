@@ -121,6 +121,7 @@ test-suite rocksdb-tests
   default-language: Haskell2010
   
   other-modules:    Integration.SimpleSpec
+                  , Integration.IteratorSimpleSpec
 
   build-depends:    QuickCheck       >= 2.7
                   , base

@@ -1,12 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Integration.SimpleSpec
-
+module Integration.SimpleSpec ( spec )
 where
 
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
+import           Matchers
 import           RocksDB
-import           RocksDB.Types
 import           RocksDB.Options
 import           RocksDB.ReadOptions
 import           RocksDB.WriteOptions
@@ -14,10 +13,11 @@ import           System.Directory
 import           System.FilePath
 import           Test.Hspec
 
+dbPath :: IO FilePath
 dbPath  = (</> "rocksdb_simple_example") <$> getTemporaryDirectory
 
 spec :: Spec
-spec = describe "Kafka.IntegrationSpec" $
+spec = describe "RocskDB.Integration.SimpleSpec" $
     it "put, get, delete" $ ensureSuccess $ do
         path <- liftIO dbPath
         db   <- open path (setCreateIfMissing True)
@@ -37,8 +37,3 @@ spec = describe "Kafka.IntegrationSpec" $
         liftIO $ dval `shouldBe` Nothing
 
         close db
-
-ensureSuccess :: RocksDBResult () -> IO ()
-ensureSuccess r = do
-    res <- runExceptT r
-    res `shouldBe` Right()
