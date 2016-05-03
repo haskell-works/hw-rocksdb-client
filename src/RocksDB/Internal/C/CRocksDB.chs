@@ -281,7 +281,7 @@ c_rocksdb_multi_get_cf db ro ckp =
 c_rocksdb_create_iterator :: RocksDBFPtr -> ReadOptionsFPtr -> IO IteratorFPtr
 c_rocksdb_create_iterator db op =
     withForeignPtr2 db op $ \db' op' ->
-      {#call rocksdb_create_iterator #} db' op' >>= newForeignPtr c_rocksdb_iter_destroyF
+      {#call rocksdb_create_iterator #} db' op' >>= newForeignPtr_ -- c_rocksdb_iter_destroyF
 
 c_rocksdb_create_iterator_cf :: RocksDBFPtr -> ReadOptionsFPtr -> ColumnFamilyHandleFPtr -> IO IteratorFPtr
 c_rocksdb_create_iterator_cf db op cf =
@@ -380,7 +380,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_iter_destroy"
     c_rocksdb_iter_destroyF :: FunPtr (IteratorPtr -> IO ())
 
 {#fun rocksdb_iter_valid as c_rocksdb_iter_valid
-    {`IteratorFPtr'} -> `Bool' #}
+    {`IteratorFPtr'} -> `Bool' numToBool #}
 
 {#fun rocksdb_iter_seek_to_first as c_rocksdb_iter_seek_to_first
     {`IteratorFPtr'} -> `()' #}
@@ -399,7 +399,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_iter_destroy"
 
 c_rocksdb_iter_key :: IteratorFPtr -> IO (Maybe ByteString)
 c_rocksdb_iter_key iter =
-    withForeignPtr iter $ \iter' ->
+    withForeignPtr iter $ \iter' -> do
         alloca $ \sz -> do
             res <- {#call rocksdb_iter_key #} iter' sz
             sz' <- peek sz

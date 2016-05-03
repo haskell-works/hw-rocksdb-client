@@ -1,50 +1,92 @@
 module RocksDB.Iterator
-
+( Iterator
+, Iterate (..)
+, runIterator, runIterator'
+, runIteratorFrom, runIteratorFrom'
+)
 where
 
-import RocksDB.Types
+import Control.Exception
+import Control.Monad.IO.Class
 import Data.ByteString (ByteString)
 import RocksDB.Internal.C
-import Control.Monad.IO.Class
 import RocksDB.ReadOptions
+import RocksDB.Types
 
 data Iterator = Iterator ReadOptionsFPtr IteratorFPtr
 data Iterate a = IterateNext a | IterateCompleted a
 
-createIterator :: MonadIO m => RocksDB -> ReadOptions -> m Iterator
-createIterator (RocksDB _ db) (ReadOptions o) =
-  liftIO $ Iterator o <$> c_rocksdb_create_iterator db o
+runIterator :: MonadIO m
+            => RocksDB
+            -> ReadOptions
+            -> a
+            -> (a -> (ByteString, ByteString) -> a)
+            -> m a
+runIterator db o z f=
+  liftIO $ bracket (createIterator db o)
+                    closeIterator
+                    (\i -> foldMonad (next i) f z)
 
-createIteratorFrom :: MonadIO m => RocksDB -> ReadOptions -> ByteString -> m Iterator
-createIteratorFrom (RocksDB _ db) (ReadOptions o) k = do
-  iter <- liftIO $ c_rocksdb_create_iterator db o
-  liftIO $ c_rocksdb_iter_seek iter k
+runIterator' :: MonadIO m
+             => RocksDB
+             -> ReadOptions
+             -> a
+             -> (a -> (ByteString, ByteString) -> Iterate a)
+             -> m a
+runIterator' db o z f=
+  liftIO $ bracket (createIterator db o)
+                    closeIterator
+                    (\i -> foldMonad' (next i) f z)
+
+runIteratorFrom :: MonadIO m
+                => RocksDB
+                -> ReadOptions
+                -> a
+                -> ByteString
+                -> (a -> (ByteString, ByteString) -> a)
+                -> m a
+runIteratorFrom db o z k f =
+  liftIO $ bracket (createIteratorFrom db o k)
+                   closeIterator
+                   (\i -> foldMonad (next i) f z)
+
+runIteratorFrom' :: MonadIO m
+                 => RocksDB
+                 -> ReadOptions
+                 -> a
+                 -> ByteString
+                 -> (a -> (ByteString, ByteString) -> Iterate a)
+                 -> m a
+runIteratorFrom' db o z k f =
+  liftIO $ bracket (createIteratorFrom db o k)
+                   closeIterator
+                   (\i -> foldMonad' (next i) f z)
+
+createIterator :: RocksDB -> ReadOptions -> IO Iterator
+createIterator (RocksDB _ db) (ReadOptions o) = do
+  iter <- c_rocksdb_create_iterator db o
+  c_rocksdb_iter_seek_to_first iter
   return $ Iterator o iter
 
-foldIterator :: MonadIO m
-             => Iterator
-             -> (a -> (ByteString, ByteString) -> a)
-             -> a
-             -> m a
-foldIterator i = foldMonad (liftIO $ next i)
+createIteratorFrom :: RocksDB -> ReadOptions -> ByteString -> IO Iterator
+createIteratorFrom (RocksDB _ db) (ReadOptions o) k = do
+  iter <- c_rocksdb_create_iterator db o
+  c_rocksdb_iter_seek iter k
+  return $ Iterator o iter
 
-foldIterator' :: MonadIO m
-              => Iterator
-              -> (a -> (ByteString, ByteString) -> Iterate a)
-              -> a
-              -> m a
-foldIterator' i = foldMonad' (liftIO $ next i)
+closeIterator :: Iterator -> IO ()
+closeIterator (Iterator _ i) = c_rocksdb_iter_destroy i
 
 next :: Iterator -> IO (Maybe (ByteString, ByteString))
 next (Iterator _ i) = do
   valid <- c_rocksdb_iter_valid i
   if valid
-     then do
-       c_rocksdb_iter_next i
-       key <- c_rocksdb_iter_key i
-       val <- c_rocksdb_iter_value i
-       return $ (,) <$> key <*> val
-     else return Nothing
+    then do
+      key <- c_rocksdb_iter_key i
+      val <- c_rocksdb_iter_value i
+      c_rocksdb_iter_next i
+      return $ (,) <$> key <*> val
+    else return Nothing
 
 
 foldMonad :: Monad m => m (Maybe a) -> (b -> a -> b) -> b -> m b
