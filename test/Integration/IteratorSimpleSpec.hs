@@ -14,37 +14,44 @@ import           Test.Hspec
 import           Matchers
 import           Data.ByteString (ByteString)
 import           Data.ByteString.Char8 (singleton)
-import Control.Concurrent
 
 dbPath :: IO FilePath
 dbPath  = (</> "rocksdb_iter_simple_example") <$> getTemporaryDirectory
 
 spec :: Spec
-spec = describe "RocksDB.Integration.IteratorSimpleSpec" $
-    it "iterate through" $ ensureSuccess $ do
-        path <- liftIO dbPath
-        db   <- open path (setCreateIfMissing True)
+spec = beforeAll createContext . afterAll (\(db, _, _) -> ensureSuccess $ close db) $
+  describe "RocksDB.Integration.IteratorSimpleSpec" $ do
+    it "iterate through" $ \(db, rOpts, input) -> ensureSuccess $ do
+       res <- runIterator db rOpts [] (flip (:))
+       liftIO $ reverse res `shouldBe` input
 
-        wOpts <- defaultWriteOptions
-        rOpts <- defaultReadOptions
+    it "iterate from statring point" $ \(db, rOpts, input) -> ensureSuccess $ do
+       res2 <- runIteratorFrom db rOpts [] "f" (flip (:))
+       liftIO $ reverse res2 `shouldBe` drop 5 input
 
-        let input =  [(bs, bs) | x <- ['a' .. 'z'], let bs = singleton x]
+    it "breakable iterator" $ \(db, rOpts, input) -> ensureSuccess $ do
+       res3 <- runIterator' db rOpts [] takeOne
+       liftIO $ reverse res3 `shouldBe` take 1 input
 
-        mapM_ (uncurry $ put db wOpts) input
+    it "breakable iterator from starting point" $ \(db, rOpts, input) -> ensureSuccess $ do
+       res4 <- runIteratorFrom' db rOpts [] "g" takeOne
+       liftIO $ reverse res4 `shouldBe` (take 1 . drop 6) input
 
-        res <- runIterator db rOpts [] (flip (:))
-        liftIO $ reverse res `shouldBe` input
+createContext :: IO (RocksDB, ReadOptions, [(ByteString, ByteString)])
+createContext = do
+  res <- runExceptT create
+  case res of
+    Right x -> return x
+    Left _ -> undefined
+  where
+    create = do
+      path  <- liftIO dbPath
+      db    <- open path (setCreateIfMissing True)
+      wOpts <- defaultWriteOptions
+      rOpts <- defaultReadOptions
+      let input =  [(bs, bs) | x <- ['a' .. 'z'], let bs = singleton x]
+      mapM_ (uncurry $ put db wOpts) input
+      return (db, rOpts, input)
 
-        res2 <- runIteratorFrom db rOpts [] "f" (flip (:))
-        liftIO $ reverse res2 `shouldBe` drop 5 input
-
-        res3 <- runIterator' db rOpts [] acc
-        liftIO $ reverse res3 `shouldBe` take 1 input
-
-        res4 <- runIteratorFrom' db rOpts [] "g" acc
-        liftIO $ reverse res4 `shouldBe` (take 1 . drop 6) input
-
-        close db
-
-acc :: [(ByteString, ByteString)] -> (ByteString, ByteString) -> Iterate [(ByteString, ByteString)]
-acc a b = IterateCompleted (b : a)
+takeOne :: [(ByteString, ByteString)] -> (ByteString, ByteString) -> Iterate [(ByteString, ByteString)]
+takeOne a b = IterateCompleted (b : a)
