@@ -21,21 +21,39 @@ dbPath  = (</> "rocksdb_iter_simple_example") <$> getTemporaryDirectory
 spec :: Spec
 spec = beforeAll createContext . afterAll (\(db, _, _) -> ensureSuccess $ close db) $
   describe "RocksDB.Integration.IteratorSimpleSpec" $ do
-    it "iterate through" $ \(db, rOpts, input) -> ensureSuccess $ do
-       res <- runIterator db rOpts [] (flip (:))
-       liftIO $ reverse res `shouldBe` input
+    context "forward iterators" $ do
+      it "iterate through" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIterator db rOpts [] (flip (:))
+         liftIO $ reverse res `shouldBe` input
 
-    it "iterate from statring point" $ \(db, rOpts, input) -> ensureSuccess $ do
-       res2 <- runIteratorFrom db rOpts [] "f" (flip (:))
-       liftIO $ reverse res2 `shouldBe` drop 5 input
+      it "iterate from statring point" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIteratorFrom db rOpts [] "f" (flip (:))
+         liftIO $ reverse res `shouldBe` drop 5 input
 
-    it "breakable iterator" $ \(db, rOpts, input) -> ensureSuccess $ do
-       res3 <- runIterator' db rOpts [] takeOne
-       liftIO $ reverse res3 `shouldBe` take 1 input
+      it "breakable iterator" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIterator' db rOpts [] takeOne
+         liftIO $ reverse res `shouldBe` take 1 input
 
-    it "breakable iterator from starting point" $ \(db, rOpts, input) -> ensureSuccess $ do
-       res4 <- runIteratorFrom' db rOpts [] "g" takeOne
-       liftIO $ reverse res4 `shouldBe` (take 1 . drop 6) input
+      it "breakable iterator from starting point" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIteratorFrom' db rOpts [] "g" takeOne
+         liftIO $ reverse res `shouldBe` (take 1 . drop 6) input
+
+    context "backwards iterators" $ do
+      it "iterate throug" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIteratorBackwards db rOpts [] (flip (:))
+         liftIO $ res `shouldBe` input
+
+      it "iterate from statring point" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIteratorBackwardsFrom db rOpts [] "f" (flip (:))
+         liftIO $ res `shouldBe` take 6 input
+
+      it "breakable iterator" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIteratorBackwards' db rOpts [] takeOne
+         liftIO $ res `shouldBe` take 1 (reverse input)
+
+      it "breakable iterator from starting point" $ \(db, rOpts, input) -> ensureSuccess $ do
+         res <- runIteratorBackwardsFrom' db rOpts [] "g" takeOne
+         liftIO $ res `shouldBe` (take 1 . drop 6) input
 
 createContext :: IO (RocksDB, ReadOptions, [(ByteString, ByteString)])
 createContext = do
