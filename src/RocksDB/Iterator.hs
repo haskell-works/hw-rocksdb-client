@@ -3,6 +3,8 @@ module RocksDB.Iterator
 , Iterate (..)
 , runIterator, runIterator'
 , runIteratorFrom, runIteratorFrom'
+, runIteratorBackwards, runIteratorBackwards'
+, runIteratorBackwardsFrom, runIteratorBackwardsFrom'
 )
 where
 
@@ -13,81 +15,148 @@ import RocksDB.Internal.C
 import RocksDB.ReadOptions
 import RocksDB.Types
 
+-- | RocksDB Iterator. There is no need to use it directly.
 data Iterator = Iterator ReadOptionsFPtr IteratorFPtr
-data Iterate a = IterateNext a | IterateCompleted a
 
+-- | Iterator step indicating how to proceed with the next iteration.
+data Iterate a = IterateNext a       -- ^ Iteration result, next iteration needed
+               | IterateCompleted a  -- ^ Iteration result, stop iterating
+
+data IteratorSeek = SeekFirst | SeekLast | SeekAt ByteString
+data IteratorMove = MovePrev | MoveNext
+
+-- | Runs iterator through the whole database (from a smallest key to a largest one)
 runIterator :: MonadIO m
-            => RocksDB
-            -> ReadOptions
-            -> a
-            -> (a -> (ByteString, ByteString) -> a)
-            -> m a
-runIterator db o z f=
-  liftIO $ bracket (createIterator db o)
-                    closeIterator
-                    (\i -> foldMonad (next i) f z)
+            => RocksDB                              -- ^ RocksDB handle
+            -> ReadOptions                          -- ^ Read options
+            -> a                                    -- ^ Initial value
+            -> (a -> (ByteString, ByteString) -> a) -- ^ Folding function
+            -> m a                                  -- ^ Returns a result of a folding function
+runIterator = performIterator MoveNext SeekFirst
 
+-- | Runs iterator through the whole database backwards (from a largest ket to a smallest one)
+runIteratorBackwards :: MonadIO m
+                     => RocksDB                              -- ^ RocksDB handle
+                     -> ReadOptions                          -- ^ Read options
+                     -> a                                    -- ^ Initial value
+                     -> (a -> (ByteString, ByteString) -> a) -- ^ Folding function
+                     -> m a                                  -- ^ Returns a result of a folding function
+runIteratorBackwards = performIterator MovePrev SeekLast
+
+-- | Runs iterator from the smallest key forward to the largest key giving the ability to stop at any point
 runIterator' :: MonadIO m
-             => RocksDB
-             -> ReadOptions
-             -> a
-             -> (a -> (ByteString, ByteString) -> Iterate a)
-             -> m a
-runIterator' db o z f=
-  liftIO $ bracket (createIterator db o)
-                    closeIterator
-                    (\i -> foldMonad' (next i) f z)
+             => RocksDB                                       -- ^ RocksDB handle
+             -> ReadOptions                                   -- ^ Read options
+             -> a                                             -- ^ Initial value
+             -> (a -> (ByteString, ByteString) -> Iterate a)  -- ^ Folding function. Returning 'IterateCompleted' will stop the iterator.
+             -> m a                                           -- ^ Returns a result of a folding function
+runIterator' = performIterator' MoveNext SeekFirst
 
+-- | Runs iterator from the largest key to the smallest key giving the ability to stop at any point
+runIteratorBackwards' :: MonadIO m
+                      => RocksDB                                       -- ^ RocksDB handle
+                      -> ReadOptions                                   -- ^ Read options
+                      -> a                                             -- ^ Initial value
+                      -> (a -> (ByteString, ByteString) -> Iterate a)  -- ^ Folding function. Returning 'IterateCompleted' will stop the iterator.
+                      -> m a                                           -- ^ Returns a result of a folding function
+runIteratorBackwards' = performIterator' MovePrev SeekLast
+
+-- | Runs iterator from the specified key forward (from smallest to largest)
 runIteratorFrom :: MonadIO m
-                => RocksDB
+                => RocksDB                               -- ^ RocksDB handle
+                -> ReadOptions                           -- ^ Read options
+                -> a                                     -- ^ Initial value
+                -> ByteString                            -- ^ Starting key
+                -> (a -> (ByteString, ByteString) -> a)  -- ^ Folding function
+                -> m a                                   -- ^ Returns a result of a folding function
+runIteratorFrom db o z k =
+  performIterator MoveNext (SeekAt k) db o z
+
+-- | Runs iterator from the specified key backwards (from largest to smallest)
+runIteratorBackwardsFrom :: MonadIO m
+                         => RocksDB                              -- ^ RocksDB handle
+                         -> ReadOptions                          -- ^ Read options
+                         -> a                                    -- ^ Initial value
+                         -> ByteString                           -- ^ Starting key
+                         -> (a -> (ByteString, ByteString) -> a) -- ^ Folding function
+                         -> m a                                  -- ^ Returns a result of a folding function
+runIteratorBackwardsFrom db o z k =
+  performIterator MovePrev (SeekAt k) db o z
+
+-- | Runs iterator from the specified key forward (from smallest to largest) 
+-- giving the ability to stop at any point
+runIteratorFrom' :: MonadIO m
+                 => RocksDB                                      -- ^ RocksDB handle
+                 -> ReadOptions                                  -- ^ Read options
+                 -> a                                            -- ^ Initial value
+                 -> ByteString                                   -- ^ Starting key
+                 -> (a -> (ByteString, ByteString) -> Iterate a) -- ^ Folding function. Returning 'IterateCompleted' will stop the iterator.
+                 -> m a                                          -- ^ Returns a result of a folding function
+runIteratorFrom' db o z k =
+  performIterator' MoveNext (SeekAt k) db o z
+
+-- | Runs iterator from the specified key backwards (from largest to smallest)
+-- giving the ability to stop at any point
+runIteratorBackwardsFrom' :: MonadIO m
+                          => RocksDB                                      -- ^ RocksDB handle
+                          -> ReadOptions                                  -- ^ Read options
+                          -> a                                            -- ^ Initial value
+                          -> ByteString                                   -- ^ Starting key
+                          -> (a -> (ByteString, ByteString) -> Iterate a) -- ^ Folding function. Returning 'IterateCompleted' will stop the iterator.
+                          -> m a                                          -- ^ Returns a result of a folding function
+runIteratorBackwardsFrom' db o z k =
+  performIterator' MovePrev (SeekAt k) db o z
+
+performIterator :: MonadIO m
+                => IteratorMove
+                -> IteratorSeek
+                -> RocksDB
                 -> ReadOptions
                 -> a
-                -> ByteString
                 -> (a -> (ByteString, ByteString) -> a)
                 -> m a
-runIteratorFrom db o z k f =
-  liftIO $ bracket (createIteratorFrom db o k)
+performIterator s p db o z f =
+  liftIO $ bracket (createIterator db o p)
                    closeIterator
-                   (\i -> foldMonad (next i) f z)
+                   (\i -> foldMonad (move s i) f z)
 
-runIteratorFrom' :: MonadIO m
-                 => RocksDB
+performIterator' :: MonadIO m
+                 => IteratorMove
+                 -> IteratorSeek
+                 -> RocksDB
                  -> ReadOptions
                  -> a
-                 -> ByteString
                  -> (a -> (ByteString, ByteString) -> Iterate a)
                  -> m a
-runIteratorFrom' db o z k f =
-  liftIO $ bracket (createIteratorFrom db o k)
+performIterator' s p db o z f =
+  liftIO $ bracket (createIterator db o p)
                    closeIterator
-                   (\i -> foldMonad' (next i) f z)
+                   (\i -> foldMonad' (move s i) f z)
 
-createIterator :: RocksDB -> ReadOptions -> IO Iterator
-createIterator (RocksDB _ db) (ReadOptions o) = do
+createIterator :: RocksDB -> ReadOptions -> IteratorSeek -> IO Iterator
+createIterator (RocksDB _ db) (ReadOptions o) pos = do
   iter <- c_rocksdb_create_iterator db o
-  c_rocksdb_iter_seek_to_first iter
-  return $ Iterator o iter
-
-createIteratorFrom :: RocksDB -> ReadOptions -> ByteString -> IO Iterator
-createIteratorFrom (RocksDB _ db) (ReadOptions o) k = do
-  iter <- c_rocksdb_create_iterator db o
-  c_rocksdb_iter_seek iter k
+  case pos of
+    SeekFirst -> c_rocksdb_iter_seek_to_first iter
+    SeekLast  -> c_rocksdb_iter_seek_to_last iter
+    SeekAt k  -> c_rocksdb_iter_seek iter k
   return $ Iterator o iter
 
 closeIterator :: Iterator -> IO ()
 closeIterator (Iterator _ i) = c_rocksdb_iter_destroy i
 
-next :: Iterator -> IO (Maybe (ByteString, ByteString))
-next (Iterator _ i) = do
+move :: IteratorMove -> Iterator -> IO (Maybe (ByteString, ByteString))
+move step (Iterator _ i) = do
   valid <- c_rocksdb_iter_valid i
   if valid
     then do
       key <- c_rocksdb_iter_key i
       val <- c_rocksdb_iter_value i
-      c_rocksdb_iter_next i
+      case step of
+        MoveNext -> c_rocksdb_iter_next i
+        MovePrev -> c_rocksdb_iter_prev i
       return $ (,) <$> key <*> val
     else return Nothing
-
 
 foldMonad :: Monad m => m (Maybe a) -> (b -> a -> b) -> b -> m b
 foldMonad i f z =
