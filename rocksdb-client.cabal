@@ -42,13 +42,13 @@ library
                   , RocksDB.WriteOptions
                   , RocksDB.ReadOptions
                   , RocksDB.Types
+                  , RocksDB.Iterator
+                  , RocksDB.Basics
 
   other-modules:    RocksDB.Internal.C.C2HS
                   , RocksDB.Internal.C.CTypes
                   , RocksDB.Internal.C.COptions
                   , RocksDB.Internal.C.CRocksDB
-                  , RocksDB.Basics
-                  , RocksDB.Iterator
 
   default-language: Haskell2010
 
