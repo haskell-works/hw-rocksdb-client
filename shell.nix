@@ -10,7 +10,7 @@ let
   localPackages  = {};
 
   # Other non-stackage dependencies, such as LTE itself or/and hackage packages
-  otherPackages  = [ haskell.packages.lts-7.13.ghc ];
+  otherPackages  = [ haskell.packages.lts-7_13.ghc ];
 
   ################### INTERNAL HANDWAVING #####################
   isCI = if builtins.getEnv "CI" != "" then true else false;

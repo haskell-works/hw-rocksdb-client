@@ -201,9 +201,6 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#fun rocksdb_options_set_purge_redundant_kvs_while_flush as c_rocksdb_options_set_purge_redundant_kvs_while_flush
     {`OptionsFPtr', boolToNum `Bool'} -> `()' #}
 
-{#fun rocksdb_options_set_allow_os_buffer as c_rocksdb_options_set_allow_os_buffer
-    {`OptionsFPtr', boolToNum `Bool'} -> `()' #}
-
 {#fun rocksdb_options_set_allow_mmap_reads as c_rocksdb_options_set_allow_mmap_reads
     {`OptionsFPtr', boolToNum `Bool'} -> `()' #}
 
