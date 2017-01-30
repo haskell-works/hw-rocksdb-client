@@ -93,7 +93,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
     {`OptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
 
 {#fun rocksdb_options_set_compression_options as c_rocksdb_options_set_compression_options
-    {`OptionsFPtr', `Int', `Int', `Int'} -> `()' #}
+    {`OptionsFPtr', `Int', `Int', `Int', `Int'} -> `()' #}
 
 {#fun rocksdb_options_set_prefix_extractor as c_rocksdb_options_set_prefix_extractor
     {`OptionsFPtr', `SliceTransformFPtr'} -> `()' #}
@@ -123,13 +123,7 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
     {`OptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
 
 {#fun rocksdb_options_set_max_bytes_for_level_multiplier as c_rocksdb_options_set_max_bytes_for_level_multiplier
-    {`OptionsFPtr', `Int'} -> `()' #}
-
-{#fun rocksdb_options_set_expanded_compaction_factor as c_rocksdb_options_set_expanded_compaction_factor
-    {`OptionsFPtr', `Int'} -> `()' #}
-
-{#fun rocksdb_options_set_max_grandparent_overlap_factor as c_rocksdb_options_set_max_grandparent_overlap_factor
-    {`OptionsFPtr', `Int'} -> `()' #}
+    {`OptionsFPtr', `Double'} -> `()' #}
 
 {#fun rocksdb_options_set_max_bytes_for_level_multiplier_additional as c_rocksdb_options_set_max_bytes_for_level_multiplier_additional
     {`OptionsFPtr', castPtr `Ptr CInt', cIntConv `CSize'} -> `()' #}
@@ -240,9 +234,6 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#fun rocksdb_options_set_verify_checksums_in_compaction as c_rocksdb_options_set_verify_checksums_in_compaction
     {`OptionsFPtr', boolToNum `Bool'} -> `()' #}
 
-{#fun rocksdb_options_set_filter_deletes as c_rocksdb_options_set_filter_deletes
-    {`OptionsFPtr', boolToNum `Bool'} -> `()' #}
-
 {#fun rocksdb_options_set_max_sequential_skip_in_iterations as c_rocksdb_options_set_max_sequential_skip_in_iterations
     {`OptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
 
@@ -254,9 +245,6 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 
 {#fun rocksdb_options_set_delete_obsolete_files_period_micros as c_rocksdb_options_set_delete_obsolete_files_period_micros
     {`OptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
-
-{#fun rocksdb_options_set_source_compaction_factor as c_rocksdb_options_set_source_compaction_factor
-    {`OptionsFPtr', `Int'} -> `()' #}
 
 {#fun rocksdb_options_prepare_for_bulk_load as c_rocksdb_options_prepare_for_bulk_load
     {`OptionsFPtr'} -> `()' #}
@@ -276,11 +264,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#fun rocksdb_options_set_min_level_to_compress as c_rocksdb_options_set_min_level_to_compress
     {`OptionsFPtr', `Int'} -> `()' #}
 
-{#fun rocksdb_options_set_memtable_prefix_bloom_bits as c_rocksdb_options_set_memtable_prefix_bloom_bits
-    {`OptionsFPtr', cIntConv `CUInt32T'} -> `()' #}
-
-{#fun rocksdb_options_set_memtable_prefix_bloom_probes as c_rocksdb_options_set_memtable_prefix_bloom_probes
-    {`OptionsFPtr', cIntConv `CUInt32T'} -> `()' #}
+{#fun rocksdb_options_set_memtable_prefix_bloom_size_ratio as c_rocksdb_options_set_memtable_prefix_bloom_size_ratio
+    {`OptionsFPtr', `Double'} -> `()' #}
 
 --{#fun rocksdb_options_set_memtable_prefix_bloom_huge_page_tlb_size as c_rocksdb_options_set_memtable_prefix_bloom_huge_page_tlb_size
 --    {`OptionsFPtr', cIntConv `CSize'} -> `()' #}

@@ -15,11 +15,11 @@ cabal-version:       >=1.20
 description:
  From <http://rocksdb.org>:
  .
- RocksDB is an embeddable persistent key-value store for fast storage. 
+ RocksDB is an embeddable persistent key-value store for fast storage.
  RocksDB can also be the foundation for a client-server database but our current focus is on embedded workloads.
  .
- RocksDB builds on LevelDB to be scalable to run on servers with many CPU cores, 
- to efficiently use fast storage, to support IO-bound, in-memory and write-once workloads, 
+ RocksDB builds on LevelDB to be scalable to run on servers with many CPU cores,
+ to efficiently use fast storage, to support IO-bound, in-memory and write-once workloads,
  and to be flexible to allow for innovation.
 
 extra-source-files:  README.md
@@ -37,7 +37,7 @@ library
   Build-tools:      c2hs
   exposed-modules:  RocksDB
                   , RocksDB.Internal.C
-                  , RocksDB.Internal.Types 
+                  , RocksDB.Internal.Types
                   , RocksDB.Options
                   , RocksDB.WriteOptions
                   , RocksDB.ReadOptions
@@ -62,14 +62,14 @@ library
                   , transformers
 
   ghc-options:      -Wall -rtsopts -funbox-strict-fields
-  ghc-prof-options: -prof -auto-all
+  -- ghc-prof-options: -prof -auto-all
 
   hs-source-dirs:   src
-  
+
   --include-dirs:     /usr/local/include
   --extra-lib-dirs:   /usr/local/lib
   --extra-libraries:  rocksdb
-  
+
 executable rocksdb-simple
   hs-source-dirs:   examples
   main-is:          RocksDBSimple.hs
@@ -83,14 +83,14 @@ executable rocksdb-simple
                   , rocksdb-client
                   , transformers
   ghc-options:      -Wall -rtsopts -main-is RocksDBSimple
-  
+
   if flag(Examples)
     buildable:      True
   else
     buildable:      False
 
   extra-libraries:  rocksdb
-  
+
 executable rocksdb-low-level-simple
   hs-source-dirs:   examples
   main-is:          LowLevelSimple.hs
@@ -104,14 +104,14 @@ executable rocksdb-low-level-simple
                   , rocksdb-client
                   , transformers
   ghc-options:      -Wall -rtsopts -main-is LowLevelSimple
-  
+
   if flag(Examples)
     buildable:      True
   else
     buildable:      False
 
   extra-libraries:  rocksdb
-  
+
 
 test-suite rocksdb-tests
   type:             exitcode-stdio-1.0
@@ -119,7 +119,7 @@ test-suite rocksdb-tests
   hs-source-dirs:   test
 
   default-language: Haskell2010
-  
+
   other-modules:    Integration.SimpleSpec
                   , Integration.IteratorSimpleSpec
 
