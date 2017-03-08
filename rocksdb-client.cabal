@@ -1,5 +1,5 @@
 name:                rocksdb-client
-version:             0.1.0
+version:             1.0.0
 synopsis:            Haskell client to RocksDB
 homepage:            http://github.com/haskell-works/rocksdb-client
 bug-reports:         http://github.com/haskell-works/rocksdb-client/issues
@@ -28,7 +28,7 @@ source-repository head
   type:     git
   location: git://github.com/haskell-works/rocksdb-client.git
 
-Flag Examples
+Flag examples
   description:      Build examples
   default:          False
   manual:           True
@@ -61,7 +61,7 @@ library
                   , resourcet > 0.3.2
                   , transformers
 
-  ghc-options:      -Wall -rtsopts -funbox-strict-fields
+  ghc-options:      -Wall -funbox-strict-fields
   -- ghc-prof-options: -prof -auto-all
 
   hs-source-dirs:   src
@@ -84,7 +84,7 @@ executable rocksdb-simple
                   , transformers
   ghc-options:      -Wall -rtsopts -main-is RocksDBSimple
 
-  if flag(Examples)
+  if flag(examples)
     buildable:      True
   else
     buildable:      False

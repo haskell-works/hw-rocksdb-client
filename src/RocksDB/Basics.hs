@@ -7,7 +7,6 @@ module RocksDB.Basics
 where
 
 import           Control.Error.Util
-import           Control.Monad
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
 import           Data.ByteString            (ByteString)
@@ -17,7 +16,6 @@ import           RocksDB.Options
 import           RocksDB.ReadOptions
 import           RocksDB.Types
 import           RocksDB.WriteOptions
-import           System.FilePath
 
 -- | Opens a RocksDB database with a given path and options
 -- Note that the database must be closed with the 'close' function to avoid leaks.
