@@ -43,7 +43,8 @@ library
                   , RocksDB.ReadOptions
                   , RocksDB.Types
                   , RocksDB.Iterator
-                  , RocksDB.Basics
+                  , RocksDB.Basic
+                  , RocksDB.Except
 
   other-modules:    RocksDB.Internal.C.C2HS
                   , RocksDB.Internal.C.CTypes
@@ -122,6 +123,7 @@ test-suite rocksdb-tests
 
   other-modules:    Integration.SimpleSpec
                   , Integration.IteratorSimpleSpec
+                  , Matchers
 
   build-depends:    QuickCheck       >= 2.7
                   , base

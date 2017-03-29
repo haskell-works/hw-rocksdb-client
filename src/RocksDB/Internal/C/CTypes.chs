@@ -9,12 +9,10 @@ import Foreign.C.String
 import Data.ByteString
 
 import RocksDB.Internal.C.C2HS
-import RocksDB.Internal.Types
 
 #include <rocksdb/c.h>
 
 type OpaquePtr   = Ptr ()
-
 type ErrorIfLogExists = Bool
 
 type Destructor = OpaquePtr -> ()

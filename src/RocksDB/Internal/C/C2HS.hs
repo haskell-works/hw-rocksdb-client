@@ -10,6 +10,11 @@ import           Foreign.C.Types
 
 import           RocksDB.Internal.Types
 
+allocaNull :: Storable a => (Ptr (Ptr a) -> IO b) -> IO b
+allocaNull f = alloca $ \ptr -> do
+  _ <- poke ptr nullPtr
+  f ptr
+
 enumToCInt :: Enum a => a -> CInt
 enumToCInt = fromIntegral . fromEnum
 {-# INLINE enumToCInt #-}
@@ -173,4 +178,3 @@ eitherFromError era f = do
       Just msg -> return $ Left msg
       Nothing -> Right <$> f
 {-# INLINE eitherFromError #-}
-

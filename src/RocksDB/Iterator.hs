@@ -5,6 +5,7 @@ module RocksDB.Iterator
 , runIteratorFrom, runIteratorFrom'
 , runIteratorBackwards, runIteratorBackwards'
 , runIteratorBackwardsFrom, runIteratorBackwardsFrom'
+, module RocksDB.Types
 )
 where
 
@@ -83,7 +84,7 @@ runIteratorBackwardsFrom :: MonadIO m
 runIteratorBackwardsFrom db o z k =
   performIterator MovePrev (SeekAt k) db o z
 
--- | Runs iterator from the specified key forward (from smallest to largest) 
+-- | Runs iterator from the specified key forward (from smallest to largest)
 -- giving the ability to stop at any point
 runIteratorFrom' :: MonadIO m
                  => RocksDB                                      -- ^ RocksDB handle

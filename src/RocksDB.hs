@@ -5,7 +5,5 @@ module RocksDB
 where
 
 import RocksDB.Types as T
-import RocksDB.Basics as X
+import RocksDB.Basic as X
 import RocksDB.Iterator as X
-
-

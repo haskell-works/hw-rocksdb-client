@@ -4,7 +4,8 @@ where
 
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
-import           RocksDB
+import           RocksDB.Except
+import           RocksDB.Iterator
 import           RocksDB.Options
 import           RocksDB.ReadOptions
 import           RocksDB.WriteOptions
