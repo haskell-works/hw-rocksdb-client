@@ -38,7 +38,7 @@ numToBool _ = False
 {-# INLINE numToBool #-}
 
 peekIntConv :: (Storable a, Integral a, Integral b) => Ptr a -> IO b
-peekIntConv = liftM fromIntegral . peek
+peekIntConv = fmap fromIntegral . peek
 {-# INLINE peekIntConv #-}
 
 nullable :: (Ptr a -> b) -> Ptr a -> Maybe b

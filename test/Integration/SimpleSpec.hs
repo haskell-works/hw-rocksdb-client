@@ -17,7 +17,7 @@ dbPath  = (</> "rocksdb_simple_example") <$> getTemporaryDirectory
 
 spec :: Spec
 spec = describe "RocskDB.Integration.SimpleSpec" $
-    it "put, get, delete" $ ensureSuccess $ do
+    it "put, get, delete" $ ensureSuccess $ do 
         path <- liftIO dbPath
         db   <- open path (setCreateIfMissing True)
 

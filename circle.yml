@@ -14,7 +14,7 @@ dependencies:
     - ./circle.build/stack-build.sh
 
 test:
-  pre:
+  pre: 
   override:
     - ./circle.build/stack-test.sh
   post:
