@@ -6,6 +6,7 @@ machine:
 dependencies:
   cache_directories:
     - "~/.stack"
+    - "~/rocksdb"
 
   pre:
     - sudo apt-get update

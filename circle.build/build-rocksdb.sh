@@ -1,10 +1,14 @@
 #!/bin/bash
 
-SRC=`mktemp -d 2>/dev/null || mktemp -d -t 'src'`
+cd ~
 
-cd ${SRC}
-git clone --depth 1 https://github.com/facebook/rocksdb rocksdb
+if [ ! -d "rocksdb" ]; then
+  git clone https://github.com/facebook/rocksdb rocksdb
+fi
 
 cd rocksdb
+git pull
+git reset v5.2.1
+
 make static_lib
 sudo make install
