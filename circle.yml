@@ -8,13 +8,16 @@ dependencies:
     - "~/.stack"
 
   pre:
+    - sudo apt-get update
+    - sudo apt-get install libgflags-dev zlib1g-dev libbz2-dev libzstd-dev libsnappy-dev
     - wget -qO- https://get.haskellstack.org/ | sh
 
   override:
+    - ./circle.build/build-rocksdb.sh
     - ./circle.build/stack-build.sh
 
 test:
-  pre: 
+  pre:
   override:
     - ./circle.build/stack-test.sh
   post:
