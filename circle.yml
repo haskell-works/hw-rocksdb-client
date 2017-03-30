@@ -9,7 +9,7 @@ dependencies:
 
   pre:
     - sudo apt-get update
-    - sudo apt-get install libgflags-dev zlib1g-dev libbz2-dev libzstd-dev libsnappy-dev
+    - sudo apt-get install libgflags-dev zlib1g-dev libbz2-dev libsnappy-dev
     - wget -qO- https://get.haskellstack.org/ | sh
 
   override:
