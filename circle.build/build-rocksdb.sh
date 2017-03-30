@@ -8,7 +8,7 @@ fi
 
 cd rocksdb
 git pull
-git reset v5.2.1
+git reset --hard v5.2.1
 
 make static_lib
 sudo make install
