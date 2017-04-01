@@ -67,7 +67,7 @@ library
 
   hs-source-dirs:   src
 
-  extra-include-dirs:     /usr/local/include
+  include-dirs:     /usr/local/include
   extra-lib-dirs:   /usr/local/lib
   extra-libraries:  rocksdb
 
@@ -141,7 +141,7 @@ test-suite rocksdb-tests
                   , temporary
                   , transformers
 
-  extra-include-dirs:     /usr/local/include
+  include-dirs:     /usr/local/include
   extra-lib-dirs:   /usr/local/lib
   extra-libraries:  rocksdb
 
