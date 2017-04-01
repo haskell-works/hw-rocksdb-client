@@ -2,4 +2,4 @@
 
 stack setup
 stack clean
-stack build --test --no-run-tests
+LD_LIBRARY_PATH=/usr/local/lib stack build --test --no-run-tests

@@ -1,3 +1,3 @@
 #! /usr/bin/env sh
 
-stack test
+LD_LIBRARY_PATH=/usr/local/lib stack test

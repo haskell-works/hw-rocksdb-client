@@ -12,3 +12,5 @@ git reset --hard v5.2.1
 
 make static_lib
 sudo make install
+make shared_lib
+sudo make install
