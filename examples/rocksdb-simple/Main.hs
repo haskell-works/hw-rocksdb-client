@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
-module RocksDBSimple
 
-where
-import           Control.Monad.IO.Class
-import           Control.Monad.Trans.Except
-import           RocksDB
-import           RocksDB.Options
-import           RocksDB.ReadOptions
-import           RocksDB.WriteOptions
-import           System.Directory
-import           System.FilePath
+module Main where
+
+import Control.Monad.IO.Class
+import Control.Monad.Trans.Except
+import RocksDB
+import RocksDB.Options
+import RocksDB.ReadOptions
+import RocksDB.WriteOptions
+import System.Directory
+import System.FilePath
 
 dbPath :: IO FilePath
 dbPath  = (</> "rocksdb_simple_example")       <$> getTemporaryDirectory

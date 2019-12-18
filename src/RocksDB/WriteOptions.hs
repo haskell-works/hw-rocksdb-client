@@ -16,9 +16,12 @@ import           RocksDB.Internal.C
 data WriteOptions = WriteOptions WriteOptionsFPtr
 data WriteOptionsBuilder = WriteOptionsBuilder { runWriteOptions :: WriteOptions -> IO WriteOptions }
 
+instance Semigroup WriteOptionsBuilder where
+  a <> b = WriteOptionsBuilder (runWriteOptions a >=> runWriteOptions b)
+
 instance Monoid WriteOptionsBuilder where
     mempty = WriteOptionsBuilder return
-    mappend a b = WriteOptionsBuilder (runWriteOptions a >=> runWriteOptions b)
+    mappend = (<>)
 
 createWriteOptions :: MonadIO m => WriteOptionsBuilder -> m WriteOptions
 createWriteOptions o = liftIO $ (WriteOptions <$> liftIO c_rocksdb_writeoptions_create) >>= runWriteOptions o

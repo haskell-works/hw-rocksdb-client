@@ -1,0 +1,169 @@
+cabal-version: 2.2
+
+name:                hw-rocksdb-client
+version:             1.0.0
+synopsis:            Haskell client to RocksDB
+homepage:            http://github.com/haskell-works/hw-rocksdb-client
+bug-reports:         http://github.com/haskell-works/hw-rocksdb-client/issues
+license:             MIT
+license-file:        LICENSE
+author:              Alexey Raga <alexey.raga@gmail.com>
+maintainer:          Alexey Raga <alexey.raga@gmail.com>
+copyright:           Copyright (c) 2012-2017 Alexey Raga
+category:            Database
+stability:           Experimental
+build-type:          Simple
+description:          From <http://rocksdb.org>:
+                      .
+                      RocksDB is an embeddable persistent key-value store for fast storage.
+                      RocksDB can also be the foundation for a client-server database but our current focus is on embedded workloads.
+                      .
+                      RocksDB builds on LevelDB to be scalable to run on servers with many CPU cores,
+                      to efficiently use fast storage, to support IO-bound, in-memory and write-once workloads,
+                      and to be flexible to allow for innovation.
+
+extra-source-files:  README.md
+
+source-repository head
+  type:     git
+  location: git://github.com/haskell-works/hw-rocksdb-client.git
+
+common base                 { build-depends: base                 >= 4 && < 5               }
+
+common bytestring           { build-depends: bytestring                                     }
+common data-default         { build-depends: data-default                                   }
+common directory            { build-depends: directory                                      }
+common doctest              { build-depends: doctest                                        }
+common doctest-discover     { build-depends: doctest-discover                               }
+common errors               { build-depends: errors                                         }
+common exceptions           { build-depends: exceptions           >= 0.6                    }
+common filepath             { build-depends: filepath                                       }
+common hspec                { build-depends: hspec                                          }
+common hw-prim              { build-depends: hw-prim                                        }
+common mtl                  { build-depends: mtl                                            }
+common QuickCheck           { build-depends: QuickCheck           >= 2.7                    }
+common resourcet            { build-depends: resourcet            >= 0.3.2                  }
+common tasty                { build-depends: tasty                >= 0.10                   }
+common tasty-quickcheck     { build-depends: tasty-quickcheck     >= 0.8                    }
+common temporary            { build-depends: temporary                                      }
+common transformers         { build-depends: transformers                                   }
+
+common config
+  default-language:     Haskell2010
+  ghc-options:          -Wall
+
+common hw-rocksdb-client
+  build-depends:        hw-rocksdb-client
+
+Flag examples
+  description:          Build examples
+  default:              False
+  manual:               True
+
+library
+  import:               base, config
+                      , bytestring
+                      , data-default
+                      , errors
+                      , exceptions
+                      , filepath
+                      , resourcet
+                      , transformers
+  build-tool-depends:   c2hs:c2hs
+  exposed-modules:      RocksDB
+                      , RocksDB.Internal.C
+                      , RocksDB.Internal.Types
+                      , RocksDB.Options
+                      , RocksDB.WriteOptions
+                      , RocksDB.ReadOptions
+                      , RocksDB.Types
+                      , RocksDB.Iterator
+                      , RocksDB.Basic
+                      , RocksDB.Except
+                      , RocksDB.Internal.C.C2HS
+                      , RocksDB.Internal.C.CTypes
+                      , RocksDB.Internal.C.COptions
+                      , RocksDB.Internal.C.CRocksDB
+  ghc-options:          -funbox-strict-fields
+  hs-source-dirs:       src
+  include-dirs:         /usr/local/include
+  extra-lib-dirs:       /usr/local/lib
+  extra-libraries:      rocksdb
+
+executable rocksdb-simple
+  import:               base, config
+                      , bytestring
+                      , directory
+                      , errors
+                      , filepath
+                      , hw-rocksdb-client
+                      , transformers
+  hs-source-dirs:       examples/rocksdb-simple
+  main-is:              Main.hs
+  ghc-options:          -Wall -rtsopts
+  ghc-options:          -rtsopts
+
+  if flag(examples)
+    buildable:          True
+  else
+    buildable:          False
+
+  extra-libraries:      rocksdb
+
+executable rocksdb-low-level-simple
+  import:               base, config
+                      , bytestring
+                      , directory
+                      , errors
+                      , filepath
+                      , hw-rocksdb-client
+                      , transformers
+  hs-source-dirs:       examples/lowlevel-simple
+  main-is:              Main.hs
+  ghc-options:          -rtsopts
+
+  if flag(examples)
+    buildable:          True
+  else
+    buildable:          False
+
+  extra-libraries:      rocksdb
+
+
+test-suite rocksdb-tests
+  import:               base, config
+                      , bytestring
+                      , data-default
+                      , directory
+                      , errors
+                      , exceptions
+                      , filepath
+                      , hspec
+                      , mtl
+                      , QuickCheck
+                      , hw-rocksdb-client
+                      , tasty
+                      , tasty-quickcheck
+                      , temporary
+                      , transformers
+  type:                 exitcode-stdio-1.0
+  main-is:              Spec.hs
+  hs-source-dirs:       test
+  other-modules:        Integration.SimpleSpec
+                      , Integration.IteratorSimpleSpec
+                      , Matchers
+  include-dirs:         /usr/local/include
+  extra-lib-dirs:       /usr/local/lib
+  extra-libraries:      rocksdb
+  ghc-options:          -rtsopts -threaded -with-rtsopts=-N
+
+test-suite doctest
+  import:               base, config
+                      , doctest
+                      , doctest-discover
+                      , hw-rocksdb-client
+  type:                 exitcode-stdio-1.0
+  ghc-options:          -threaded
+  main-is:              DoctestDriver.hs
+  HS-Source-Dirs:       doctest
+  build-tool-depends:   doctest-discover:doctest-discover

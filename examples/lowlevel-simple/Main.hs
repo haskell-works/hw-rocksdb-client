@@ -1,12 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
-module LowLevelSimple
 
-where
+module Main where
 
-import           RocksDB.Internal.C as C
-import           RocksDB.Types
-import           System.Directory
-import           System.FilePath
+import RocksDB.Internal.C as C
+import RocksDB.Types
+import System.Directory
+import System.FilePath
 
 dbPath :: IO FilePath
 dbPath  = (</> "rocksdb_ll_simple_example")       <$> getTemporaryDirectory

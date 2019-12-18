@@ -23,9 +23,12 @@ import           RocksDB.Internal.C
 data Options = Options OptionsFPtr
 data OptionsBuilder = OptionsBuilder { runOptionsBuilder :: Options -> IO Options }
 
+instance Semigroup OptionsBuilder where
+  a <> b = OptionsBuilder (runOptionsBuilder a >=> runOptionsBuilder b)
+
 instance Monoid OptionsBuilder where
     mempty = OptionsBuilder return
-    mappend a b = OptionsBuilder (runOptionsBuilder a >=> runOptionsBuilder b)
+    mappend = (<>)
 
 -- | Creates 'Options' given a specification
 --
