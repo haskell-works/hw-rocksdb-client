@@ -1,14 +1,13 @@
 module RocksDB.Internal.C.C2HS where
 
-import           Control.Monad
-import           Data.Bifunctor
-import           Data.ByteString  (ByteString, packCString, packCStringLen,
-                                   useAsCString, useAsCStringLen)
-import           Foreign
-import           Foreign.C.String
-import           Foreign.C.Types
+import Control.Monad
+import Data.Bifunctor
+import Data.ByteString  (ByteString, packCString, packCStringLen, useAsCString, useAsCStringLen)
+import Foreign
+import Foreign.C.String
+import Foreign.C.Types
 
-import           RocksDB.Internal.Types
+import RocksDB.Internal.Types
 
 allocaNull :: Storable a => (Ptr (Ptr a) -> IO b) -> IO b
 allocaNull f = alloca $ \ptr -> do
@@ -176,5 +175,5 @@ eitherFromError era f = do
     era' <- peekErrorMaybe era
     case era' of
       Just msg -> return $ Left msg
-      Nothing -> Right <$> f
+      Nothing  -> Right <$> f
 {-# INLINE eitherFromError #-}

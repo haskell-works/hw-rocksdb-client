@@ -8,14 +8,14 @@ module RocksDB.Basic
 )
 where
 
-import           Control.Monad.IO.Class
-import           Data.ByteString            (ByteString)
-import           Data.Maybe
-import           RocksDB.Internal.C
-import           RocksDB.Options
-import           RocksDB.ReadOptions
-import           RocksDB.Types
-import           RocksDB.WriteOptions
+import Control.Monad.IO.Class
+import Data.ByteString        (ByteString)
+import Data.Maybe
+import RocksDB.Internal.C
+import RocksDB.Options
+import RocksDB.ReadOptions
+import RocksDB.Types
+import RocksDB.WriteOptions
 
 -- | Opens a RocksDB database with a given path and options
 -- Note that the database must be closed with the 'close' function to avoid leaks.
@@ -33,7 +33,7 @@ open p o = liftIO $ do
   res <- c_rocksdb_open opt p
   case res of
     Left (RocksDBError err) -> return . Left . RocksDBError $ "Open error: " ++ err
-    Right db -> return . Right $ RocksDB opt db
+    Right db                -> return . Right $ RocksDB opt db
   --return $ RocksDB opt <$> res
 
 -- | Opens RocksDB database in read only mode

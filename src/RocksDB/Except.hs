@@ -11,11 +11,11 @@ import           Control.Error.Util
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
 import           Data.ByteString            (ByteString)
+import qualified RocksDB.Basic              as B
 import           RocksDB.Options
 import           RocksDB.ReadOptions
 import           RocksDB.Types
 import           RocksDB.WriteOptions
-import qualified RocksDB.Basic as B
 
 -- | Opens a RocksDB database with a given path and options
 -- Note that the database must be closed with the 'close' function to avoid leaks.

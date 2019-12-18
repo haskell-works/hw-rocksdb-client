@@ -71,19 +71,19 @@ library
                       , transformers
   build-tool-depends:   c2hs:c2hs
   exposed-modules:      RocksDB
-                      , RocksDB.Internal.C
-                      , RocksDB.Internal.Types
-                      , RocksDB.Options
-                      , RocksDB.WriteOptions
-                      , RocksDB.ReadOptions
-                      , RocksDB.Types
-                      , RocksDB.Iterator
                       , RocksDB.Basic
                       , RocksDB.Except
+                      , RocksDB.Internal.C
                       , RocksDB.Internal.C.C2HS
-                      , RocksDB.Internal.C.CTypes
                       , RocksDB.Internal.C.COptions
                       , RocksDB.Internal.C.CRocksDB
+                      , RocksDB.Internal.C.CTypes
+                      , RocksDB.Internal.Types
+                      , RocksDB.Iterator
+                      , RocksDB.Options
+                      , RocksDB.ReadOptions
+                      , RocksDB.Types
+                      , RocksDB.WriteOptions
   ghc-options:          -funbox-strict-fields
   hs-source-dirs:       src
   include-dirs:         /usr/local/include

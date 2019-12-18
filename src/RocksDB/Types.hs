@@ -4,9 +4,9 @@ module RocksDB.Types
 )
 where
 
-import           RocksDB.Internal.C
-import           RocksDB.Internal.Types
-import           Control.Monad.Trans.Except
+import Control.Monad.Trans.Except
+import RocksDB.Internal.C
+import RocksDB.Internal.Types
 
 newtype ErrorIfExists = ErrorIfExists Bool
 
