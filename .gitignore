@@ -30,6 +30,7 @@ cabal-dev
 cabal.sandbox.config
 cabal.config
 .stack-work/
+dist-newstyle/
 
 ### Emacs ###
 # -*- mode: gitignore; -*-
