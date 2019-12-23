@@ -1,31 +1,34 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
+
 module RocksDB.Options
-( Options(..)
-, OptionsBuilder
-, defaultOptions
-, createOptions
-, setCompaction
-, setCompression
-, setParallelism
-, setCreateIfMissing
-, setCreateMissingCF
-, setErrorIfExists
-, setParanoidChecks
-, setNumLevels
-, setUseFsync
-)
+  ( Options(..)
+  , OptionsBuilder
+  , defaultOptions
+  , createOptions
+  , setCompaction
+  , setCompression
+  , setParallelism
+  , setCreateIfMissing
+  , setCreateMissingCF
+  , setErrorIfExists
+  , setParanoidChecks
+  , setNumLevels
+  , setUseFsync
+  ) where
 
-where
-
-import           Control.Monad
-import           RocksDB.Internal.C
+import Control.Monad
+import Data.Semigroup     (Semigroup (..))
+import RocksDB.Internal.C
 
 data Options = Options OptionsFPtr
 data OptionsBuilder = OptionsBuilder { runOptionsBuilder :: Options -> IO Options }
 
+instance Semigroup OptionsBuilder where
+    (<>) a b = OptionsBuilder (runOptionsBuilder a >=> runOptionsBuilder b)
+
 instance Monoid OptionsBuilder where
     mempty = OptionsBuilder return
-    mappend a b = OptionsBuilder (runOptionsBuilder a >=> runOptionsBuilder b)
+    mappend = (<>)
 
 -- | Creates 'Options' given a specification
 --

@@ -3,7 +3,7 @@
 , rocksdb, stdenv, tasty, tasty-quickcheck, temporary, transformers
 }:
 mkDerivation {
-  pname = "rocksdb-client";
+  pname = "hw-rocksdb-client";
   version = "1.0.0";
   src = ./.;
   isLibrary = true;
@@ -19,7 +19,7 @@ mkDerivation {
     hspec mtl QuickCheck tasty tasty-quickcheck temporary transformers
   ];
   testSystemDepends = [ rocksdb ];
-  homepage = "http://github.com/haskell-works/rocksdb-client";
+  homepage = "http://github.com/haskell-works/hw-rocksdb-client";
   description = "Haskell client to RocksDB";
   license = stdenv.lib.licenses.mit;
 }

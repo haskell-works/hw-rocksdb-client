@@ -1,24 +1,26 @@
 module RocksDB.WriteOptions
-( WriteOptions(..)
-, WriteOptionsBuilder
-, createWriteOptions
-, defaultWriteOptions
-, setSync
-, disableWAL
-)
+  ( WriteOptions(..)
+  , WriteOptionsBuilder
+  , createWriteOptions
+  , defaultWriteOptions
+  , setSync
+  , disableWAL
+  ) where
 
-where
-
-import           Control.Monad
-import           Control.Monad.IO.Class
-import           RocksDB.Internal.C
+import Control.Monad
+import Control.Monad.IO.Class
+import Data.Semigroup         (Semigroup (..))
+import RocksDB.Internal.C
 
 data WriteOptions = WriteOptions WriteOptionsFPtr
 data WriteOptionsBuilder = WriteOptionsBuilder { runWriteOptions :: WriteOptions -> IO WriteOptions }
 
+instance Semigroup WriteOptionsBuilder where
+    a <> b = WriteOptionsBuilder (runWriteOptions a >=> runWriteOptions b)
+
 instance Monoid WriteOptionsBuilder where
     mempty = WriteOptionsBuilder return
-    mappend a b = WriteOptionsBuilder (runWriteOptions a >=> runWriteOptions b)
+    mappend = (<>)
 
 createWriteOptions :: MonadIO m => WriteOptionsBuilder -> m WriteOptions
 createWriteOptions o = liftIO $ (WriteOptions <$> liftIO c_rocksdb_writeoptions_create) >>= runWriteOptions o
