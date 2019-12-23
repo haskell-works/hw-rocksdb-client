@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
-module RocksDBSimple
+module Main where
 
-where
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
 import           RocksDB

@@ -228,14 +228,8 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 {#fun rocksdb_options_set_bytes_per_sync as c_rocksdb_options_set_bytes_per_sync
     {`OptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
 
-{#fun rocksdb_options_set_verify_checksums_in_compaction as c_rocksdb_options_set_verify_checksums_in_compaction
-    {`OptionsFPtr', boolToNum `Bool'} -> `()' #}
-
 {#fun rocksdb_options_set_max_sequential_skip_in_iterations as c_rocksdb_options_set_max_sequential_skip_in_iterations
     {`OptionsFPtr', cIntConv `CUInt64T'} -> `()' #}
-
-{#fun rocksdb_options_set_disable_data_sync as c_rocksdb_options_set_disable_data_sync
-    {`OptionsFPtr', `Int'} -> `()' #}
 
 {#fun rocksdb_options_set_disable_auto_compactions as c_rocksdb_options_set_disable_auto_compactions
     {`OptionsFPtr', `Int'} -> `()' #}
@@ -269,9 +263,6 @@ foreign import ccall safe "rocksdb/c.h &rocksdb_options_destroy"
 
 {#fun rocksdb_options_set_max_successive_merges as c_rocksdb_options_set_max_successive_merges
     {`OptionsFPtr', cIntConv `CSize'} -> `()' #}
-
-{#fun rocksdb_options_set_min_partial_merge_operands as c_rocksdb_options_set_min_partial_merge_operands
-    {`OptionsFPtr', cIntConv `CUInt32T'} -> `()' #}
 
 {#fun rocksdb_options_set_bloom_locality as c_rocksdb_options_set_bloom_locality
     {`OptionsFPtr', cIntConv `CUInt32T'} -> `()' #}
