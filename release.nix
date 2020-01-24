@@ -1,4 +1,6 @@
 let
-  pkgs = import <nixpkgs> { };
+  pinnedPkgs = import ./pkgs-from-json.nix { json = ./nixpkgs-19.09-darwin.json; };
 in
-  pkgs.haskellPackages.callPackage ./default.nix { }
+  { project1 = pinnedPkgs.haskellPackages.callPackage ./default.nix { };
+  }
+
