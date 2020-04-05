@@ -9,7 +9,6 @@ module RocksDB.WriteOptions
 
 import Control.Monad
 import Control.Monad.IO.Class
-import Data.Semigroup         (Semigroup (..))
 import RocksDB.Internal.C
 
 data WriteOptions = WriteOptions WriteOptionsFPtr
