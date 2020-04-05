@@ -17,7 +17,6 @@ module RocksDB.Options
   ) where
 
 import Control.Monad
-import Data.Semigroup     (Semigroup (..))
 import RocksDB.Internal.C
 
 data Options = Options OptionsFPtr

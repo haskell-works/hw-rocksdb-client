@@ -10,7 +10,6 @@ module RocksDB.ReadOptions
 
 import Control.Monad
 import Control.Monad.IO.Class
-import Data.Semigroup         (Semigroup (..))
 import RocksDB.Internal.C
 
 data ReadOptions = ReadOptions ReadOptionsFPtr
